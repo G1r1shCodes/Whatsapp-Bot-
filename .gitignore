@@ -1,0 +1,20 @@
+# Environments
+.env
+.venv
+env/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local Database (Using Supabase Cloud now)
+whatsapp_bot.db
+
+# Scratch / Testing
+scratch/
+
+# OS Files
+.DS_Store
+Thumbs.db

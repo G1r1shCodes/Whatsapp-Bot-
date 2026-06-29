@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDI Power — AI Sales Dashboard</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-bolt brand-icon"></i>
+                </div>
+                <div class="brand-info">
+                    <h2>KDI Power</h2>
+                    <span>AI Assistant Admin</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="analytics-tab">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Analytics</span>
+                </button>
+                <button class="nav-item" data-tab="leads-tab">
+                    <i class="fa-solid fa-inbox"></i>
+                    <span>Leads Inbox</span>
+                </button>
+                <button class="nav-item" data-tab="catalog-tab">
+                    <i class="fa-solid fa-cubes"></i>
+                    <span>Cables Catalog</span>
+                </button>
+            </nav>
+            
+            <div class="system-status">
+                <div class="status-indicator">
+                    <span class="status-dot online"></span>
+                    <span class="status-label">Bot: Online</span>
+                </div>
+                <div class="status-indicator">
+                    <span class="status-dot online"></span>
+                    <span class="status-label">Supabase: Connected</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="header-title">
+                    <h1 id="page-title">Analytics Overview</h1>
+                    <p class="text-secondary" id="page-subtitle">Real-time performance and insights</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="refresh-data-btn">
+                        <i class="fa-solid fa-arrows-rotate"></i> Refresh
+                    </button>
+                    <div class="user-profile">
+                        <div class="user-avatar">SP</div>
+                        <div class="user-details">
+                            <span class="user-name">Sales Team</span>
+                            <span class="user-role">Administrator</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Tabs -->
+            <div class="tab-content-container">
+                
+                <!-- 1. Analytics & Overview Tab -->
+                <section id="analytics-tab" class="tab-panel active">
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-cyan">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Total Leads</span>
+                                <h3 id="stat-total-leads">-</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-amber">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">New Inquiries</span>
+                                <h3 id="stat-new-leads">-</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-indigo">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Quoted Leads</span>
+                                <h3 id="stat-quoted-leads">-</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-emerald">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Deals Won</span>
+                                <h3 id="stat-won-leads">-</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="charts-grid">
+                        <div class="chart-card card">
+                            <div class="card-header">
+                                <h3>Product Inquiries Breakdown</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="productChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-card card">
+                            <div class="card-header">
+                                <h3>Inquiry Conversion Funnel</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="statusChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Leads Inbox Tab -->
+                <section id="leads-tab" class="tab-panel">
+                    <div class="inbox-layout">
+                        <!-- Leads List Panel -->
+                        <div class="leads-list-panel card">
+                            <div class="inbox-search">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="lead-search-input" placeholder="Search leads by name, company, phone...">
+                            </div>
+                            <div class="inbox-filters">
+                                <button class="filter-btn active" data-filter="All">All</button>
+                                <button class="filter-btn" data-filter="New">New</button>
+                                <button class="filter-btn" data-filter="Contacted">Contacted</button>
+                                <button class="filter-btn" data-filter="Quoted">Quoted</button>
+                                <button class="filter-btn" data-filter="Won">Won</button>
+                            </div>
+                            <div class="leads-list-scroll">
+                                <div class="leads-loading text-center" id="leads-list-loading">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading leads...
+                                </div>
+                                <div class="leads-list" id="leads-list-container">
+                                    <!-- Dynamic leads go here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lead Details Panel -->
+                        <div class="lead-detail-panel card" id="lead-detail-panel">
+                            <div class="empty-state" id="detail-empty-state">
+                                <i class="fa-solid fa-inbox"></i>
+                                <h3>Select a Lead</h3>
+                                <p>Click on any lead from the inbox to view details and conversation transcript</p>
+                            </div>
+                            <div class="detail-content hidden" id="detail-content-area">
+                                <div class="detail-header">
+                                    <div class="customer-profile">
+                                        <div class="customer-avatar" id="detail-avatar">RK</div>
+                                        <div class="customer-info">
+                                            <h3 id="detail-name">Rajesh Kumar</h3>
+                                            <p id="detail-company">Apex Builders</p>
+                                        </div>
+                                    </div>
+                                    <div class="status-updater">
+                                        <label for="lead-status-select">Status:</label>
+                                        <select id="lead-status-select" class="status-dropdown">
+                                            <option value="New">New</option>
+                                            <option value="Contacted">Contacted</option>
+                                            <option value="Quoted">Quoted</option>
+                                            <option value="Won">Won</option>
+                                            <option value="Lost">Lost</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="detail-grid">
+                                    <!-- Customer Details Card -->
+                                    <div class="detail-card">
+                                        <h4>Inquiry Information</h4>
+                                        <div class="info-row">
+                                            <span class="info-label"><i class="fa-solid fa-phone"></i> Phone:</span>
+                                            <span class="info-val" id="detail-phone">+91 99999 99999</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label"><i class="fa-solid fa-location-dot"></i> Location:</span>
+                                            <span class="info-val" id="detail-location">Noida Sector 62</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label"><i class="fa-solid fa-cubes"></i> Product:</span>
+                                            <span class="info-val highlight-cyan" id="detail-product">KDI Single Core 1.5 sq mm FR</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label"><i class="fa-solid fa-calculator"></i> Quantity:</span>
+                                            <span class="info-val" id="detail-qty">20 coils</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label"><i class="fa-solid fa-calendar"></i> Submitted:</span>
+                                            <span class="info-val" id="detail-date">2026-06-29 15:30</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Chat Transcript Card -->
+                                    <div class="chat-transcript-card">
+                                        <h4>WhatsApp Chat Log</h4>
+                                        <div class="chat-container-bubble" id="chat-bubbles-container">
+                                            <!-- Conversation bubbles go here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Cables Catalog Tab -->
+                <section id="catalog-tab" class="tab-panel">
+                    <div class="catalog-container card">
+                        <div class="catalog-header">
+                            <div class="catalog-filters">
+                                <label for="category-select">Category:</label>
+                                <select id="category-select" class="dropdown-filter">
+                                    <option value="All">All Categories</option>
+                                    <option value="House Wires">House Wires</option>
+                                    <option value="Power Cables">Power Cables</option>
+                                    <option value="Submersible Cables">Submersible Cables</option>
+                                    <option value="Control Cables">Control Cables</option>
+                                </select>
+                            </div>
+                            <span class="info-note"><i class="fa-solid fa-circle-info text-cyan"></i> Click on the Price or Stock fields in the table below to edit product details directly.</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="catalog-table">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Product Name</th>
+                                        <th>Conductor</th>
+                                        <th>Size</th>
+                                        <th>Cores</th>
+                                        <th>Est. Price (per meter)</th>
+                                        <th>Stock Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="catalog-table-body">
+                                    <!-- Dynamic catalog rows go here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden">
+        <i class="fa-solid fa-circle-check toast-icon"></i>
+        <span id="toast-message">Status updated successfully!</span>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
