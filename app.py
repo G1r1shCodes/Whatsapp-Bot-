@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Response
-from twilio.twiml.messaging_response import MessagingResponse
+from pydantic import BaseModel
 import db
 import ai
 import re
@@ -10,14 +10,17 @@ db.init_db()
 
 app = FastAPI(title="KDI Power AI WhatsApp Assistant")
 
+class WhatsAppMessage(BaseModel):
+    From: str
+    Body: str
+    ProfileName: str = "Sir/Mam"
+
 @app.post("/whatsapp")
-async def whatsapp(request: Request):
-    form_data = await request.form()
-    
-    # Twilio fields
-    from_number = form_data.get("From", "").replace("whatsapp:", "").strip()
-    incoming_msg = form_data.get("Body", "").strip()
-    profile_name = form_data.get("ProfileName", "").strip()
+async def whatsapp(msg: WhatsAppMessage):
+    # Node.js whatsapp-web.js fields
+    from_number = msg.From.replace("@c.us", "").strip()
+    incoming_msg = msg.Body.strip()
+    profile_name = msg.ProfileName.strip()
     if not profile_name or profile_name.lower() in ["customer", "unknown", "guest", "someone"]:
         profile_name = "Sir/Mam"
     
@@ -97,13 +100,14 @@ async def whatsapp(request: Request):
         else:
             reply_text = status_msg
             
+    # Format markdown for WhatsApp (convert ** to *)
+    reply_text = reply_text.replace("**", "*")
+    
     # Log outbound response
     db.log_chat_message(from_number, "outbound", reply_text)
     
-    # Send WhatsApp response via Twilio TwiML
-    response = MessagingResponse()
-    response.message(reply_text)
-    return Response(content=str(response), media_type="application/xml")
+    # Send WhatsApp response via JSON back to Node.js bot
+    return {"reply": reply_text}
 
 # --- Dashboard API & Page Routes ---
 from fastapi.staticfiles import StaticFiles

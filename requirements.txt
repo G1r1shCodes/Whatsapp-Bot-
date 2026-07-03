@@ -1,4 +1,9 @@
 fastapi==0.110.0
 uvicorn==0.29.0
-twilio==8.5.0
 python-multipart==0.0.9
+langchain
+langchain-community
+chromadb
+sentence-transformers
+pandas
+openpyxl

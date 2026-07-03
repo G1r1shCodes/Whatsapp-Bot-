@@ -147,6 +147,19 @@ def update_product_price_and_stock(product_name, price, stock_status):
     }
     request_supabase("products", "PATCH", data=data, params={"name": f"eq.{product_name}"})
 
+def upsert_product(product_data):
+    name = product_data.get("name")
+    if not name:
+        return None
+    
+    existing = get_product_by_id(name)
+    if existing:
+        request_supabase("products", "PATCH", data=product_data, params={"name": f"eq.{name}"})
+        return "updated"
+    else:
+        request_supabase("products", "POST", data=product_data)
+        return "created"
+
 def get_product_categories():
     products = get_all_products()
     categories = list(set([p["category"] for p in products]))

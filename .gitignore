@@ -18,3 +18,9 @@ scratch/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Node / WebJS
+node_modules/
+.wwebjs_auth/
+.wwebjs_cache/
+

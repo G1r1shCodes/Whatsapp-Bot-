@@ -5,6 +5,21 @@ import json
 import time
 import re
 import db
+import warnings
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import Chroma
+
+# Suppress some of the verbose langchain warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+
+# Initialize Vector DB globally to avoid reloading models per request
+try:
+    hf_embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    vectorstore = Chroma(persist_directory="data/chroma_db", embedding_function=hf_embeddings)
+except Exception as e:
+    print("Warning: Could not initialize ChromaDB vectorstore.", e)
+    vectorstore = None
 
 def load_env():
     env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
@@ -53,17 +68,28 @@ def get_ai_response(phone, profile_name):
             f"  Description: {p['specifications']}\n\n"
         )
 
+    retrieved_context = ""
+    if not is_greeting and last_msg_clean and vectorstore is not None:
+        try:
+            docs = vectorstore.similarity_search(last_msg, k=4)
+            if docs:
+                retrieved_context = "\n[KNOWLEDGE BASE CONTEXT]\nBelow is technical information from the KDI Catalog and Website. Use this to accurately answer the user:\n"
+                for i, doc in enumerate(docs):
+                    retrieved_context += f"--- Source {i+1} ---\n{doc.page_content}\n\n"
+        except Exception as e:
+            print("Vector search error:", e)
+
     system_prompt = f"""You are the official KDI Power AI Assistant on WhatsApp. 
 KDI Power is a premier manufacturer of high-quality electrical cables and wires.
-
-KDI Power Product Catalog:
+{retrieved_context}
+KDI Power Product Catalog (Structured Pricing & Stock Database):
 {products_txt}
 
 Guidelines:
-1. GREETING STRUCTURE: When the user starts a conversation or sends a greeting (like 'hi', 'hello', or similar), you MUST start your response with EXACTLY:
+1. GREETING STRUCTURE: ONLY greet the user on the FIRST message of a conversation. If the user's message is a greeting, you MUST start your response with EXACTLY:
    "Hi {profile_name}" (replacing {profile_name} with their name, or using "Hi Sir/Mam" if the name is not known)
    "Welcome to KDI Power"
-   (Note: "Welcome to KDI Power" MUST start on the very next line right after the greeting, with no empty lines in between). Follow this immediately with the standard options menu template.
+   (Note: "Welcome to KDI Power" MUST start on the very next line right after the greeting, with no empty lines in between). Follow this immediately with the standard options menu template. Do NOT include this greeting if they are asking a follow-up question.
 2. PRODUCT & SPECIFICATION INQUIRIES: Answer inquiries about product specifications, materials (Copper/Aluminium), stock status, and estimated pricing based ONLY on the catalog above. If the customer mentions a specific wire size (e.g. '1.5 sq mm' or '2.5 sq mm' or cores) in their first message, do NOT show the standard options menu template. Directly answer their technical query or offer to start the quote request. If they ask to browse standard products generally, show the 4 categories (House Wires, Power Cables, Submersible Cables, Control Cables) and ask them which category they are interested in.
 3. If they inquire about pricing, ALWAYS remind them that cable prices fluctuate daily with copper/aluminum metal market rates and the quoted prices are indicative estimations.
 4. If the customer wants to request a quote, conversationally gather the following details step-by-step:
