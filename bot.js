@@ -1,6 +1,8 @@
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
 console.log("Initializing WhatsApp Web Client...");
 
@@ -62,7 +64,18 @@ client.on('message', async msg => {
         // Reply to user on WhatsApp if backend returns a valid reply
         if (response.data && response.data.reply) {
             console.log(`📤 Sending reply to ${profileName}...`);
-            await msg.reply(response.data.reply);
+            if (response.data.image) {
+                const imgPath = path.join(__dirname, 'data', 'images', response.data.image);
+                if (fs.existsSync(imgPath)) {
+                    const media = MessageMedia.fromFilePath(imgPath);
+                    await msg.reply(media, undefined, { caption: response.data.reply });
+                } else {
+                    console.log(`⚠️ Image not found: ${imgPath}`);
+                    await msg.reply(response.data.reply);
+                }
+            } else {
+                await msg.reply(response.data.reply);
+            }
         } else {
             console.log("⚠️ Received empty or invalid response from FastAPI backend.");
         }

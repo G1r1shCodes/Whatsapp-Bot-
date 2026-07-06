@@ -40,6 +40,13 @@ async def whatsapp(msg: WhatsAppMessage):
     submit_match = re.search(r'\[LEAD_SUBMIT:\s*(\{.*?\})\s*\]', ai_response, re.DOTALL)
     status_match = "[LEAD_STATUS_CHECK]" in ai_response
     
+    image_match = re.search(r'\[IMAGE:\s*(.+?)\s*\]', ai_response)
+    image_file = None
+    if image_match:
+        image_file = image_match.group(1).strip()
+        reply_text = re.sub(r'\[IMAGE:\s*.+?\s*\]', '', reply_text).strip()
+
+    
     if submit_match:
         try:
             lead_data = json.loads(submit_match.group(1))
@@ -107,7 +114,10 @@ async def whatsapp(msg: WhatsAppMessage):
     db.log_chat_message(from_number, "outbound", reply_text)
     
     # Send WhatsApp response via JSON back to Node.js bot
-    return {"reply": reply_text}
+    response_payload = {"reply": reply_text}
+    if image_file:
+        response_payload["image"] = image_file
+    return response_payload
 
 # --- Dashboard API & Page Routes ---
 from fastapi.staticfiles import StaticFiles
