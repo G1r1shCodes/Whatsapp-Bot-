@@ -3,7 +3,6 @@ import json
 import urllib.request
 import urllib.parse
 from datetime import datetime
-import re
 # Helper to load .env variables manually
 def load_env():
     env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
@@ -191,12 +190,15 @@ def log_chat_message(phone, direction, body):
     }
     request_supabase("chat_history", "POST", data=data)
 
-def get_chat_history(phone):
+def get_chat_history(phone, limit=30):
     params = {
         "phone": f"eq.{phone}",
-        "order": "created_at.asc"
+        "order": "created_at.desc",
+        "limit": str(limit)
     }
     res = request_supabase("chat_history", "GET", params=params)
+    # Reverse to get chronological order (oldest first)
+    res = list(reversed(res))
     for row in res:
         row["timestamp"] = row["created_at"]
     return res

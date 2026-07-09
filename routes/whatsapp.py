@@ -122,14 +122,17 @@ async def whatsapp_webhook(request: Request):
                     if submit_match:
                         try:
                             lead_data = json.loads(submit_match.group(1))
+                            # Validate required fields
+                            if not lead_data.get("name") or not lead_data.get("product"):
+                                raise ValueError("Missing required lead fields: name and product")
                             lead_id = db.create_lead(
                                 phone=from_number,
-                                name=lead_data.get("name", "Unknown"),
-                                company=lead_data.get("company", "Individual"),
+                                name=lead_data.get("name", "Unknown")[:200],
+                                company=lead_data.get("company", "Individual")[:200],
                                 email="",
-                                location=lead_data.get("location", "Unknown"),
-                                product_interest=lead_data.get("product", "Unknown"),
-                                quantity=lead_data.get("quantity", "Unknown"),
+                                location=lead_data.get("location", "Unknown")[:200],
+                                product_interest=lead_data.get("product", "Unknown")[:200],
+                                quantity=lead_data.get("quantity", "Unknown")[:100],
                                 requirements=f"Captured via AI chatbot. Qty: {lead_data.get('quantity')}. Loc: {lead_data.get('location')}."
                             )
                             cleaned_text = re.sub(r'\[LEAD_SUBMIT:\s*\{.*?\}\s*\]', '', ai_response, flags=re.DOTALL).strip()

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel
 import db
 import ai
 import re
 import json
+import auth
 
 router = APIRouter()
 
@@ -14,16 +15,21 @@ class TestChatMessage(BaseModel):
     profile_name: str = "Tester"
 
 @router.get("/dashboard")
-async def get_dashboard():
+async def get_dashboard(request: Request):
+    if not auth.verify_auth(request):
+        return RedirectResponse(url="/login")
     return FileResponse("templates/dashboard.html")
 
 @router.get("/test-chat")
-async def get_test_chat():
+async def get_test_chat(request: Request):
+    if not auth.verify_auth(request):
+        return RedirectResponse(url="/login")
     return FileResponse("templates/test_chat.html")
 
 @router.post("/api/test-chat")
-async def api_test_chat(msg: TestChatMessage):
+async def api_test_chat(msg: TestChatMessage, request: Request):
     """Bypasses Meta API and interacts directly with AI for testing."""
+    auth.require_auth(request)
     incoming_msg = msg.message.strip()
     if not incoming_msg:
         return {"error": "Message is empty"}
@@ -45,14 +51,17 @@ async def api_test_chat(msg: TestChatMessage):
     if submit_match:
         try:
             lead_data = json.loads(submit_match.group(1))
+            # Validate required fields
+            if not lead_data.get("name") or not lead_data.get("product"):
+                raise ValueError("Missing required lead fields: name and product")
             lead_id = db.create_lead(
                 phone=msg.phone,
-                name=lead_data.get("name", "Unknown"),
-                company=lead_data.get("company", "Individual"),
+                name=lead_data.get("name", "Unknown")[:200],
+                company=lead_data.get("company", "Individual")[:200],
                 email="",
-                location=lead_data.get("location", "Unknown"),
-                product_interest=lead_data.get("product", "Unknown"),
-                quantity=lead_data.get("quantity", "Unknown"),
+                location=lead_data.get("location", "Unknown")[:200],
+                product_interest=lead_data.get("product", "Unknown")[:200],
+                quantity=lead_data.get("quantity", "Unknown")[:100],
                 requirements=f"Captured via AI chatbot. Qty: {lead_data.get('quantity')}. Loc: {lead_data.get('location')}."
             )
             cleaned_text = re.sub(r'\[LEAD_SUBMIT:\s*\{.*?\}\s*\]', '', ai_response, flags=re.DOTALL).strip()
@@ -76,22 +85,30 @@ async def api_test_chat(msg: TestChatMessage):
     return {"reply": reply_text, "image": image_file}
 
 @router.get("/api/leads")
-async def get_leads_api(status: str = None, search: str = None):
+async def get_leads_api(request: Request, status: str = None, search: str = None):
+    auth.require_auth(request)
     return db.get_leads(status_filter=status, search_query=search)
 
 @router.patch("/api/leads/{lead_id}/status")
 async def update_lead_status_api(lead_id: int, request: Request):
+    auth.require_auth(request)
     payload = await request.json()
     status = payload.get("status")
+    ALLOWED_STATUSES = {"New", "Contacted", "Quoted", "Won", "Lost"}
+    if status not in ALLOWED_STATUSES:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail=f"Invalid status. Allowed: {', '.join(ALLOWED_STATUSES)}")
     db.update_lead_status(lead_id, status)
     return {"success": True, "lead_id": lead_id, "status": status}
 
 @router.get("/api/leads/{phone}/history")
-async def get_lead_history_api(phone: str):
+async def get_lead_history_api(phone: str, request: Request):
+    auth.require_auth(request)
     return db.get_chat_history(phone)
 
 @router.get("/api/dashboard/stats")
-async def get_stats_api():
+async def get_stats_api(request: Request):
+    auth.require_auth(request)
     leads = db.get_leads()
     
     total_leads = len(leads)
@@ -127,13 +144,18 @@ async def get_stats_api():
     }
 
 @router.get("/api/products")
-async def get_products_api():
+async def get_products_api(request: Request):
+    auth.require_auth(request)
     return db.get_all_products()
 
 @router.patch("/api/products/{product_name}")
 async def update_product_api(product_name: str, request: Request):
+    auth.require_auth(request)
     payload = await request.json()
     price = payload.get("price")
     stock_status = payload.get("stock_status")
+    if price is not None and (not isinstance(price, (int, float)) or price < 0):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Price must be a non-negative number.")
     db.update_product_price_and_stock(product_name, price, stock_status)
     return {"success": True, "product": product_name}
