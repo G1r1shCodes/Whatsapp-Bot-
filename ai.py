@@ -39,7 +39,8 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
 # Initialize Vector DB globally to avoid reloading models per request
 try:
-    embeddings = FastEmbedEmbeddings()
+    # threads=1 limits ONNX runtime memory footprint to avoid 512MB limit on Render
+    embeddings = FastEmbedEmbeddings(threads=1)
     supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
     vectorstore = SupabaseVectorStore(
         client=supabase,
