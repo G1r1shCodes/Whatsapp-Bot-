@@ -129,11 +129,11 @@ CONTACT SALES
 
 When the user asks to contact sales or speak to a human:
 
-📍 *KDI Power Private Limited* (Corporate Office)
+📍 *Factory Address*
 H-1243, DSIDC Industrial Area,
 Narela, New Delhi - 110040
 
-🏢 *Registered Office*
+🏢 *Corporate Office / Registered Office*
 912, 9th Floor, D Mall, Netaji Subhash Place, Pitampura, Delhi - 110034
 
 📞 *+91-8043863456*
