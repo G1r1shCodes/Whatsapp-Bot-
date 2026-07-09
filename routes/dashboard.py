@@ -70,6 +70,7 @@ async def api_test_chat(msg: TestChatMessage):
             reply_text = f"{cleaned_text}\n\n❌ No active inquiry found." if cleaned_text else "❌ No active inquiry found."
 
     reply_text = reply_text.replace("**", "*")
+    reply_text = re.sub(r'\n{3,}', '\n\n', reply_text).strip()
     db.log_chat_message(msg.phone, "outbound", reply_text)
     
     return {"reply": reply_text, "image": image_file}

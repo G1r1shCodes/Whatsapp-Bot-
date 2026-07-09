@@ -120,6 +120,7 @@ If a matching image exists in Available Images and is relevant:
 Output exactly (on its own line):
 [IMAGE: filename.jpg]
 
+When showing an image, ALWAYS mention the specific product name in your message text so the user knows what they are looking at.
 Use ONLY filenames listed in Available Images. Never invent filenames.
 
 ========================

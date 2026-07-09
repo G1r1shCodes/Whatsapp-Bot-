@@ -150,6 +150,7 @@ async def whatsapp_webhook(request: Request):
                         reply_text = f"{cleaned_text}\n\n{status_msg}" if cleaned_text else status_msg
 
                     reply_text = reply_text.replace("**", "*")
+                    reply_text = re.sub(r'\n{3,}', '\n\n', reply_text).strip()
                     db.log_chat_message(from_number, "outbound", reply_text)
                     
                     # Send image to Meta API if one was requested
