@@ -12,7 +12,7 @@ app = FastAPI(title="KDI Power AI WhatsApp Assistant")
 
 from routes import whatsapp, dashboard
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, FileResponse
 import os
 
 # Create static directories if they don't exist
@@ -26,6 +26,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/")
 async def root():
     return RedirectResponse(url="/dashboard")
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse("static/images/kdi-logo-90x90.png")
 
 # Include Routers
 app.include_router(whatsapp.router)
