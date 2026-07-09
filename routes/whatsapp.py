@@ -152,10 +152,12 @@ async def whatsapp_webhook(request: Request):
                     reply_text = reply_text.replace("**", "*")
                     db.log_chat_message(from_number, "outbound", reply_text)
                     
-                    # We might need an actual URL for the image for Meta API, but for now we'll just send text.
-                    # Or we could host the image locally and send the public URL.
-                    # For simplicity, if we don't have a public URL yet, we just send text.
-                    send_whatsapp_message(from_number, reply_text)
+                    # Send image to Meta API if one was requested
+                    image_url = None
+                    if image_file:
+                        image_url = f"https://whatsapp-bot-m3u1.onrender.com/static/images/{image_file}"
+                        
+                    send_whatsapp_message(from_number, reply_text, image_url=image_url)
                     
         return Response(status_code=200)
     except Exception as e:
