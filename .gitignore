@@ -24,3 +24,6 @@ node_modules/
 .wwebjs_auth/
 .wwebjs_cache/
 
+# RAG Data
+data/chroma_db/
+data/kdi_knowledge.txt

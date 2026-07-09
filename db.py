@@ -4,7 +4,6 @@ import urllib.request
 import urllib.parse
 from datetime import datetime
 import re
-
 # Helper to load .env variables manually
 def load_env():
     env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
@@ -16,34 +15,51 @@ def load_env():
                     key, val = line.split("=", 1)
                     os.environ[key.strip()] = val.strip()
 
+from logger import get_logger
+logger = get_logger(__name__)
+
 load_env()
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
 def request_supabase(endpoint, method="GET", data=None, params=None):
-    url = f"{SUPABASE_URL}/rest/v1/{endpoint}"
-    if params:
-        url += "?" + urllib.parse.urlencode(params)
-        
-    req_data = None
-    if data is not None:
-        req_data = json.dumps(data).encode("utf-8")
-        
-    req = urllib.request.Request(url, data=req_data, method=method)
-    req.add_header("apikey", SUPABASE_KEY)
-    req.add_header("Authorization", f"Bearer {SUPABASE_KEY}")
-    req.add_header("Content-Type", "application/json")
-    req.add_header("Prefer", "return=representation")
-    
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        logger.warning(f"SUPABASE_URL or SUPABASE_KEY is missing. Returning mock data for {endpoint}.")
+        if endpoint == "leads":
+            return [
+                {"id": 1, "phone": "1234567890", "name": "John Doe", "company": "Acme Corp", "product_interest": "Power Cables", "status": "New", "created_at": datetime.utcnow().isoformat()},
+                {"id": 2, "phone": "0987654321", "name": "Jane Smith", "company": "Tech Solutions", "product_interest": "House Wires", "status": "Quoted", "created_at": datetime.utcnow().isoformat()}
+            ]
+        elif endpoint == "products":
+            return [
+                {"name": "1.5 sq mm House Wire", "category": "House Wires", "conductor": "Copper", "size": "1.5 sq mm", "core": 1, "insulation": "PVC", "price_per_meter": 12.5, "stock_status": "In Stock", "specifications": "Flame retardant house wire"},
+                {"name": "2.5 sq mm Power Cable", "category": "Power Cables", "conductor": "Aluminium", "size": "2.5 sq mm", "core": 3, "insulation": "XLPE", "price_per_meter": 45.0, "stock_status": "In Stock", "specifications": "Heavy duty power cable"}
+            ]
+        return []
+
     try:
+        url = f"{SUPABASE_URL}/rest/v1/{endpoint}"
+        if params:
+            url += "?" + urllib.parse.urlencode(params)
+            
+        req_data = None
+        if data is not None:
+            req_data = json.dumps(data).encode("utf-8")
+            
+        req = urllib.request.Request(url, data=req_data, method=method)
+        req.add_header("apikey", SUPABASE_KEY)
+        req.add_header("Authorization", f"Bearer {SUPABASE_KEY}")
+        req.add_header("Content-Type", "application/json")
+        req.add_header("Prefer", "return=representation")
+        
         with urllib.request.urlopen(req) as res:
             res_content = res.read().decode("utf-8")
             if res_content:
                 return json.loads(res_content)
             return []
     except Exception as e:
-        print(f"Supabase API error on {endpoint} [{method}]: {e}")
+        logger.error(f"Supabase API error on {endpoint} [{method}]: {e}")
         return []
 
 def init_db():

@@ -3,7 +3,11 @@ uvicorn==0.29.0
 python-multipart==0.0.9
 langchain
 langchain-community
+langchain-core
+langchain-huggingface
 chromadb
 sentence-transformers
 pandas
 openpyxl
+PyMuPDF
+requests

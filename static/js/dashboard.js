@@ -60,33 +60,44 @@ function formatDateTime(isoString) {
 navItems.forEach(item => {
     item.addEventListener('click', () => {
         const targetTab = item.getAttribute('data-tab');
+        if (currentTab === targetTab) return;
         
-        // Update active class
-        navItems.forEach(btn => btn.classList.remove('active'));
-        item.classList.add('active');
-        
-        // Show panel
-        tabPanels.forEach(panel => {
-            if (panel.id === targetTab) {
-                panel.classList.add('active');
-            } else {
-                panel.classList.remove('active');
-            }
-        });
-        
-        currentTab = targetTab;
-        updateHeaderMetadata();
-        
-        // Tab specific actions
-        if (targetTab === 'analytics-tab') {
-            loadAnalyticsData();
-        } else if (targetTab === 'leads-tab') {
-            loadLeadsData();
-        } else if (targetTab === 'catalog-tab') {
-            loadCatalogData();
+        if (!document.startViewTransition) {
+            switchTab(targetTab, item);
+        } else {
+            document.startViewTransition(() => {
+                switchTab(targetTab, item);
+            });
         }
     });
 });
+
+function switchTab(targetTab, activeItem) {
+    // Update active class
+    navItems.forEach(btn => btn.classList.remove('active'));
+    activeItem.classList.add('active');
+    
+    // Show panel
+    tabPanels.forEach(panel => {
+        if (panel.id === targetTab) {
+            panel.classList.add('active');
+        } else {
+            panel.classList.remove('active');
+        }
+    });
+    
+    currentTab = targetTab;
+    updateHeaderMetadata();
+    
+    // Tab specific actions
+    if (targetTab === 'analytics-tab') {
+        loadAnalyticsData();
+    } else if (targetTab === 'leads-tab') {
+        loadLeadsData();
+    } else if (targetTab === 'catalog-tab') {
+        loadCatalogData();
+    }
+}
 
 function updateHeaderMetadata() {
     switch (currentTab) {
@@ -108,16 +119,31 @@ function updateHeaderMetadata() {
 // -------------------------------------------------------------
 // 1. Analytics & Charts
 // -------------------------------------------------------------
+function animateValue(obj, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        // easeOutQuart
+        const ease = 1 - Math.pow(1 - progress, 4);
+        obj.innerHTML = Math.floor(ease * (end - start) + start);
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
+
 async function loadAnalyticsData() {
     try {
         const res = await fetch('/api/dashboard/stats');
         const data = await res.json();
         
-        // Update Stats Counters
-        document.getElementById('stat-total-leads').textContent = data.total_leads || 0;
-        document.getElementById('stat-new-leads').textContent = data.new_leads || 0;
-        document.getElementById('stat-quoted-leads').textContent = data.quoted_leads || 0;
-        document.getElementById('stat-won-leads').textContent = data.won_leads || 0;
+        // Update Stats Counters with Animation
+        animateValue(document.getElementById('stat-total-leads'), 0, data.total_leads || 0, 1000);
+        animateValue(document.getElementById('stat-new-leads'), 0, data.new_leads || 0, 1000);
+        animateValue(document.getElementById('stat-quoted-leads'), 0, data.quoted_leads || 0, 1000);
+        animateValue(document.getElementById('stat-won-leads'), 0, data.won_leads || 0, 1000);
         
         // Load Charts
         renderProductChart(data.category_distribution || {});
