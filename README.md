@@ -1,7 +1,7 @@
 # KDI Power AI WhatsApp Assistant & Sales Dashboard
 
 ![Python](https://img.shields.io/badge/PYTHON-3.10+-0078D4?style=flat-square&logo=python&logoColor=white&labelColor=555555) ![FastAPI](https://img.shields.io/badge/-FASTAPI-009688?style=flat-square&logo=fastapi&logoColor=white) ![Twilio WhatsApp](https://img.shields.io/badge/TWILIO-WHATSAPP-F22F46?style=flat-square) ![Google Sheets API](https://img.shields.io/badge/GOOGLE%20SHEETS-API-34A853?style=flat-square) ![Deployment Render](https://img.shields.io/badge/DEPLOYMENT-RENDER-000000?style=flat-square&logo=render&logoColor=white)
-![KDI Power Dashboard](dashboard_initial_view.png) <!-- Note: Replace with actual path if needed when viewing on GitHub -->
+
 
 A state-of-the-art WhatsApp Assistant and Sales Dashboard built for **KDI Power**. 
 It features a conversational AI bot (powered by Groq Llama-3) that interacts with customers on WhatsApp, captures structured sales leads, and persists them to a Supabase PostgreSQL database. The repository also includes a premium, glassmorphic dark-mode Sales Dashboard to visualize analytics, manage the leads inbox, and update the cable products catalog in real-time.
