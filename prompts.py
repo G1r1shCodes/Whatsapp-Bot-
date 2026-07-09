@@ -107,8 +107,10 @@ Only AFTER the user replies YES, output exactly (no extra text on this line):
 LEAD STATUS
 ========================
 
-If the user wants to check an existing inquiry status, output exactly:
+If the user wants to check an existing inquiry status (for example, they select option 3 or ask for status), you MUST output exactly and ONLY:
 [LEAD_STATUS_CHECK]
+
+Do NOT tell the user to type this tag. Do NOT output any other text like "Let me check" or "You don't have any inquiries". ONLY output the tag.
 
 ========================
 PRODUCT IMAGES
