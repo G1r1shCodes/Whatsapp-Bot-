@@ -25,6 +25,11 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def root():
     return RedirectResponse(url="/dashboard")
 
+@app.get("/health")
+async def health_check():
+    """Public endpoint for cron jobs to keep the service awake."""
+    return JSONResponse({"status": "ok", "message": "Service is awake"})
+
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse("static/images/kdi-logo-90x90.png")
