@@ -58,4 +58,3 @@ This application is fully ready to be deployed on [Render.com](https://render.co
 5. **Meta Webhook:** Once deployed, copy your Render URL (e.g., `https://kdi-power-bot.onrender.com/webhook`) and configure it in your Meta App Dashboard under WhatsApp Configuration.
 
 ---
-*Tags: python, fastapi, twilio, whatsapp-bot, ai-agent, groq, llama3, supabase, dashboard, sales-crm*
