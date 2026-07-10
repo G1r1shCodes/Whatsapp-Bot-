@@ -102,8 +102,11 @@ def get_ai_response(phone, profile_name):
 
     for p in relevant_products:
         products_txt += (
-            f"• {p['name']} | {p['category']} | {p['conductor']} {p['size']} "
-            f"{p['core']}C {p['insulation']} | ~INR {p['price_per_meter']}/m | {p['stock_status']}\n"
+            f"🔹 *{p['name']}*\n"
+            f"   ▫️ Category: {p['category']}\n"
+            f"   ▫️ Specs: {p['conductor']} {p['size']} {p['core']}C {p['insulation']}\n"
+            f"   ▫️ Price: ~INR {p['price_per_meter']}/m\n"
+            f"   ▫️ Status: {p['stock_status']}\n\n"
         )
 
     # --- Available images ---
