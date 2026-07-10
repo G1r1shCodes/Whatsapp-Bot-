@@ -12,8 +12,8 @@ create table documents (
 -- Create a function to search for documents
 create or replace function match_documents (
   query_embedding vector(384),
-  match_threshold float,
-  match_count int
+  match_threshold float default 0.5,
+  match_count int default 5
 )
 returns table (
   id bigint,
