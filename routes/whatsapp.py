@@ -15,7 +15,7 @@ META_VERIFY_TOKEN = os.environ.get("META_VERIFY_TOKEN", "default_verify_token")
 META_ACCESS_TOKEN = os.environ.get("META_ACCESS_TOKEN")
 META_PHONE_NUMBER_ID = os.environ.get("META_PHONE_NUMBER_ID")
 
-def send_whatsapp_message(to_phone: str, text: str, image_url: str = None):
+def send_whatsapp_message(to_phone: str, text: str, image_url: str = None, show_menu: bool = False):
     """Sends a message to the user via Meta Cloud API."""
     if not META_ACCESS_TOKEN or not META_PHONE_NUMBER_ID:
         logger.error("Missing Meta API credentials in environment variables.")
@@ -33,7 +33,36 @@ def send_whatsapp_message(to_phone: str, text: str, image_url: str = None):
         "to": to_phone
     }
     
-    if image_url:
+    if show_menu:
+        payload["type"] = "interactive"
+        payload["interactive"] = {
+            "type": "list",
+            "header": {
+                "type": "text",
+                "text": "Welcome to KDI Power!"
+            },
+            "body": {
+                "text": text if text else "How can we assist you today?"
+            },
+            "footer": {
+                "text": "Please choose an option below:"
+            },
+            "action": {
+                "button": "Main Menu",
+                "sections": [
+                    {
+                        "title": "Options",
+                        "rows": [
+                            {"id": "menu_browse", "title": "Browse Products"},
+                            {"id": "menu_quote", "title": "Request a Quote"},
+                            {"id": "menu_track", "title": "Track My Inquiry"},
+                            {"id": "menu_contact", "title": "Contact Sales"}
+                        ]
+                    }
+                ]
+            }
+        }
+    elif image_url:
         payload["type"] = "image"
         payload["image"] = {
             "link": image_url,
@@ -95,11 +124,15 @@ async def whatsapp_webhook(request: Request):
                     contacts = value.get("contacts", [])
                     profile_name = contacts[0].get("profile", {}).get("name", "Sir/Mam") if contacts else "Sir/Mam"
                     
-                    # For now we only handle text
-                    if msg_type != "text":
-                        continue
-                        
-                    incoming_msg = msg.get("text", {}).get("body", "").strip()
+                    incoming_msg = ""
+                    if msg_type == "text":
+                        incoming_msg = msg.get("text", {}).get("body", "").strip()
+                    elif msg_type == "interactive":
+                        interactive = msg.get("interactive", {})
+                        if interactive.get("type") == "list_reply":
+                            incoming_msg = interactive.get("list_reply", {}).get("title", "").strip()
+                        elif interactive.get("type") == "button_reply":
+                            incoming_msg = interactive.get("button_reply", {}).get("title", "").strip()
                     
                     if not incoming_msg:
                         continue
@@ -116,8 +149,12 @@ async def whatsapp_webhook(request: Request):
                     # Parse specific tags
                     submit_match = re.search(r'\[LEAD_SUBMIT:\s*(\{.*?\})\s*\]', ai_response, re.DOTALL)
                     status_match = "[LEAD_STATUS_CHECK]" in ai_response
+                    menu_match = "[SHOW_MAIN_MENU]" in ai_response
                     image_match = re.search(r'\[IMAGE:\s*(.+?)\s*\]', ai_response)
                     
+                    if menu_match:
+                        reply_text = reply_text.replace("[SHOW_MAIN_MENU]", "").strip()
+                        
                     if image_match:
                         image_file = image_match.group(1).strip()
                         reply_text = re.sub(r'\[IMAGE:\s*.+?\s*\]', '', reply_text).strip()
@@ -164,7 +201,7 @@ async def whatsapp_webhook(request: Request):
                     if image_file:
                         image_url = f"https://whatsapp-bot-m3u1.onrender.com/static/images/{image_file}"
                         
-                    send_whatsapp_message(from_number, reply_text, image_url=image_url)
+                    send_whatsapp_message(from_number, reply_text, image_url=image_url, show_menu=menu_match)
                     
         return Response(status_code=200)
     except Exception as e:
