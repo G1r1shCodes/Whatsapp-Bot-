@@ -99,6 +99,9 @@ def get_ai_response(phone, profile_name):
             p.get('size', '').lower(),
         ])
     ] or all_products  # fallback to all products if no keyword match
+    
+    # Limit to top 15 to avoid Groq 413 Payload Too Large error
+    relevant_products = relevant_products[:15]
 
     for p in relevant_products:
         products_txt += (
