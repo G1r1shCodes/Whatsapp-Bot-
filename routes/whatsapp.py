@@ -27,8 +27,8 @@ def send_whatsapp_message(to_phone: str, text: str, image_url: str = None, show_
         "Content-Type": "application/json"
     }
     
-    # 1. Send Image if present
-    if image_url:
+    # 1. Send Image if present (but NOT if we are showing the main menu, since it will be embedded)
+    if image_url and not show_menu:
         payload_img = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
@@ -39,7 +39,7 @@ def send_whatsapp_message(to_phone: str, text: str, image_url: str = None, show_
             }
         }
         # If no menu follows, put the text in the caption
-        if not show_menu and not show_categories_menu and text:
+        if not show_categories_menu and text:
             payload_img["image"]["caption"] = text
             
         try:
@@ -57,11 +57,7 @@ def send_whatsapp_message(to_phone: str, text: str, image_url: str = None, show_
             "to": to_phone,
             "type": "interactive",
             "interactive": {
-                "type": "list",
-                "header": {
-                    "type": "text",
-                    "text": "KDI Power"
-                },
+                "type": "button",
                 "body": {
                     "text": text if text else "How can we assist you today?"
                 },
@@ -69,21 +65,42 @@ def send_whatsapp_message(to_phone: str, text: str, image_url: str = None, show_
                     "text": "Please choose an option below:"
                 },
                 "action": {
-                    "button": "Main Menu",
-                    "sections": [
+                    "buttons": [
                         {
-                            "title": "Options",
-                            "rows": [
-                                {"id": "menu_browse", "title": "Browse Products"},
-                                {"id": "menu_quote", "title": "Request a Quote"},
-                                {"id": "menu_track", "title": "Track My Inquiry"},
-                                {"id": "menu_contact", "title": "Contact Sales"}
-                            ]
+                            "type": "reply",
+                            "reply": {
+                                "id": "menu_browse",
+                                "title": "Browse Products"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "menu_quote",
+                                "title": "Request a Quote"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "menu_contact",
+                                "title": "Contact Sales"
+                            }
                         }
                     ]
                 }
             }
         }
+        
+        # Embed the image directly into the menu header
+        if image_url:
+            payload_menu["interactive"]["header"] = {
+                "type": "image",
+                "image": {
+                    "link": image_url
+                }
+            }
+            
         try:
             req = urllib.request.Request(url, data=json.dumps(payload_menu).encode("utf-8"), headers=headers, method="POST")
             with urllib.request.urlopen(req) as response:
