@@ -27,64 +27,92 @@ def send_whatsapp_message(to_phone: str, text: str, image_url: str = None, show_
         "Content-Type": "application/json"
     }
     
-    payload = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": to_phone
-    }
-    
-    if show_menu:
-        payload["type"] = "interactive"
-        payload["interactive"] = {
-            "type": "list",
-            "header": {
-                "type": "text",
-                "text": "Welcome to KDI Power!"
-            },
-            "body": {
-                "text": text if text else "How can we assist you today?"
-            },
-            "footer": {
-                "text": "Please choose an option below:"
-            },
-            "action": {
-                "button": "Main Menu",
-                "sections": [
-                    {
-                        "title": "Options",
-                        "rows": [
-                            {"id": "menu_browse", "title": "Browse Products"},
-                            {"id": "menu_quote", "title": "Request a Quote"},
-                            {"id": "menu_track", "title": "Track My Inquiry"},
-                            {"id": "menu_contact", "title": "Contact Sales"}
-                        ]
-                    }
-                ]
+    # 1. Send Image if present
+    if image_url:
+        payload_img = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": to_phone,
+            "type": "image",
+            "image": {
+                "link": image_url
             }
         }
-    elif image_url:
-        payload["type"] = "image"
-        payload["image"] = {
-            "link": image_url,
-            "caption": text
+        # If no menu follows, put the text in the caption
+        if not show_menu and text:
+            payload_img["image"]["caption"] = text
+            
+        try:
+            req = urllib.request.Request(url, data=json.dumps(payload_img).encode("utf-8"), headers=headers, method="POST")
+            with urllib.request.urlopen(req) as response:
+                logger.info("Sent image successfully")
+        except Exception as e:
+            logger.error(f"Error sending Meta image: {e}")
+
+    # 2. Send Menu if requested
+    if show_menu:
+        payload_menu = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": to_phone,
+            "type": "interactive",
+            "interactive": {
+                "type": "list",
+                "header": {
+                    "type": "text",
+                    "text": "KDI Power"
+                },
+                "body": {
+                    "text": text if text else "How can we assist you today?"
+                },
+                "footer": {
+                    "text": "Please choose an option below:"
+                },
+                "action": {
+                    "button": "Main Menu",
+                    "sections": [
+                        {
+                            "title": "Options",
+                            "rows": [
+                                {"id": "menu_browse", "title": "Browse Products"},
+                                {"id": "menu_quote", "title": "Request a Quote"},
+                                {"id": "menu_track", "title": "Track My Inquiry"},
+                                {"id": "menu_contact", "title": "Contact Sales"}
+                            ]
+                        }
+                    ]
+                }
+            }
         }
-    else:
-        payload["type"] = "text"
-        payload["text"] = {
-            "preview_url": False,
-            "body": text
+        try:
+            req = urllib.request.Request(url, data=json.dumps(payload_menu).encode("utf-8"), headers=headers, method="POST")
+            with urllib.request.urlopen(req) as response:
+                logger.info("Sent menu successfully")
+        except urllib.error.HTTPError as he:
+            logger.error(f"Error sending Meta menu (HTTP {he.code}): {he.read().decode('utf-8')}")
+        except Exception as e:
+            logger.error(f"Error sending Meta menu: {e}")
+            
+    # 3. If neither, just send text
+    if not image_url and not show_menu and text:
+        payload_text = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": to_phone,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": text
+            }
         }
-        
-    try:
-        req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers, method="POST")
-        with urllib.request.urlopen(req) as response:
-            res_data = response.read().decode("utf-8")
-            logger.info(f"Meta API Response: {res_data}")
-    except urllib.error.HTTPError as he:
-        err_msg = he.read().decode("utf-8")
-        logger.error(f"Error sending Meta API message (HTTP {he.code}): {err_msg}")
-    except Exception as e:
-        logger.error(f"Error sending Meta API message: {e}")
+        try:
+            req = urllib.request.Request(url, data=json.dumps(payload_text).encode("utf-8"), headers=headers, method="POST")
+            with urllib.request.urlopen(req) as response:
+                logger.info("Sent text successfully")
+        except urllib.error.HTTPError as he:
+            logger.error(f"Error sending Meta text (HTTP {he.code}): {he.read().decode('utf-8')}")
+        except Exception as e:
+            logger.error(f"Error sending Meta text: {e}")
 
 @router.get("/webhook")
 async def verify_webhook(request: Request):
