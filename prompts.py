@@ -7,6 +7,11 @@ def get_system_prompt(
     profile_name: str = "Customer",
     conversation_start: bool = False,
 ) -> str:
+    # Pre-compute config values outside the f-string (Python 3.11 disallows backslashes in f-string expressions)
+    cfg = config_manager.get_config()
+    cfg_welcome_image = cfg.get("welcome_image", "kdi-logo-white-bg.jpg")
+    cfg_welcome_text = cfg.get("welcome_text", "Hi {profile_name}! 👋\nWelcome to *KDI Power*!").format(profile_name=profile_name)
+
     return f"""You are the official AI assistant for KDI Power Private Limited.
 KDI Power manufactures high-quality electrical wires and cables in Narela, New Delhi, India.
 
@@ -45,10 +50,10 @@ Conversation Start: {conversation_start}
 If Conversation Start is True:
   Greet the user by name and show the menu.
   Include the KDI logo by adding this exactly on its own line:
-  [IMAGE: {config_manager.get_config().get("welcome_image", "kdi-logo-white-bg.jpg")}]
+  [IMAGE: {cfg_welcome_image}]
   
   Use this format:
-    {config_manager.get_config().get("welcome_text", "Hi {profile_name}! 👋\\nWelcome to *KDI Power*!").format(profile_name=profile_name)}
+    {cfg_welcome_text}
   Then show the menu (see MENU section).
 
 If Conversation Start is False:
