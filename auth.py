@@ -62,104 +62,184 @@ LOGIN_PAGE_HTML = """<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KDI Power - Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>KDI Power - System Auth</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #0A0A0A;
+            --surface-color: #111111;
+            --copper-accent: #E86A33;
+            --copper-dim: rgba(232, 106, 51, 0.2);
+            --text-primary: #FFFFFF;
+            --text-secondary: #888888;
+            --border-color: #222222;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(var(--border-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center center;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #e2e8f0;
+            color: var(--text-primary);
         }
-        .login-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 40px;
-            width: 380px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-        .login-card h1 {
-            font-size: 1.5rem;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #06b6d4, #6366f1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .login-card p {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin-bottom: 30px;
-        }
-        .login-card input {
+        .auth-container {
             width: 100%;
-            padding: 12px 20px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.3);
-            color: white;
-            font-size: 1rem;
-            outline: none;
-            margin-bottom: 15px;
-            transition: border-color 0.3s;
+            max-width: 440px;
+            padding: 2rem;
         }
-        .login-card input:focus {
-            border-color: #06b6d4;
-            box-shadow: 0 0 10px rgba(6,182,212,0.2);
+        .brand-header {
+            margin-bottom: 3rem;
+            position: relative;
         }
-        .login-card button {
+        .brand-header::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 50%;
+            width: 1rem;
+            height: 2px;
+            background: var(--copper-accent);
+        }
+        .brand-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+        .brand-header span {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            letter-spacing: 0.1em;
+        }
+        .auth-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-top: 3px solid var(--copper-accent);
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .auth-card::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            right: -1px;
+            width: 15px;
+            height: 15px;
+            border-bottom: 1px solid var(--copper-accent);
+            border-right: 1px solid var(--copper-accent);
+        }
+        .input-group {
+            margin-bottom: 2rem;
+        }
+        .input-group label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+        .input-group input {
             width: 100%;
-            padding: 12px;
+            background: transparent;
             border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #06b6d4, #6366f1);
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
         }
-        .login-card button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(6,182,212,0.4);
+        .input-group input:focus {
+            border-bottom-color: var(--copper-accent);
+            background: linear-gradient(to top, var(--copper-dim) 0%, transparent 100%);
+        }
+        .auth-card button {
+            width: 100%;
+            background: var(--copper-accent);
+            color: #000;
+            border: none;
+            padding: 1rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .auth-card button:hover {
+            background: #fff;
         }
         .error {
-            color: #f87171;
-            font-size: 0.85rem;
-            margin-top: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--copper-accent);
+            font-size: 0.8rem;
+            margin-top: 1rem;
             display: none;
+            border-left: 2px solid var(--copper-accent);
+            padding-left: 0.75rem;
         }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <h1>🔒 KDI Power Dashboard</h1>
-        <p>Enter your access password to continue</p>
-        <form onsubmit="return handleLogin(event)">
-            <input type="password" id="password" placeholder="Dashboard password..." autofocus>
-            <button type="submit">Login</button>
-        </form>
-        <p class="error" id="error-msg">Invalid password. Please try again.</p>
+    <div class="auth-container">
+        <div class="brand-header">
+            <h1>KDI POWER</h1>
+            <span>Command Center • Auth Required</span>
+        </div>
+        <div class="auth-card">
+            <form onsubmit="return handleLogin(event)">
+                <div class="input-group">
+                    <label for="password">System Access Key</label>
+                    <input type="password" id="password" autocomplete="current-password" autofocus>
+                </div>
+                <button type="submit">Authenticate</button>
+            </form>
+            <div class="error" id="error-msg">ACCESS DENIED. INVALID KEY.</div>
+        </div>
     </div>
     <script>
         async function handleLogin(e) {
             e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.textContent;
+            btn.textContent = 'VERIFYING...';
+            
             const pw = document.getElementById('password').value;
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({password: pw})
-            });
-            if (res.ok) {
-                window.location.href = '/dashboard';
-            } else {
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({password: pw})
+                });
+                if (res.ok) {
+                    btn.textContent = 'ACCESS GRANTED';
+                    setTimeout(() => window.location.href = '/dashboard', 300);
+                } else {
+                    document.getElementById('error-msg').style.display = 'block';
+                    btn.textContent = originalText;
+                }
+            } catch (err) {
                 document.getElementById('error-msg').style.display = 'block';
+                btn.textContent = originalText;
             }
             return false;
         }

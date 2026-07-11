@@ -157,12 +157,15 @@
                                 <i class="fa-solid fa-magnifying-glass"></i>
                                 <input type="text" id="lead-search-input" placeholder="Search leads by name, company, phone...">
                             </div>
-                            <div class="inbox-filters">
-                                <button class="filter-btn active" data-filter="All">All</button>
-                                <button class="filter-btn" data-filter="New">New</button>
-                                <button class="filter-btn" data-filter="Contacted">Contacted</button>
-                                <button class="filter-btn" data-filter="Quoted">Quoted</button>
-                                <button class="filter-btn" data-filter="Won">Won</button>
+                            <div class="inbox-filters" style="display: flex; justify-content: space-between; align-items: center; padding-right: 15px;">
+                                <div>
+                                    <button class="filter-btn active" data-filter="All">All</button>
+                                    <button class="filter-btn" data-filter="New">New</button>
+                                    <button class="filter-btn" data-filter="Contacted">Contacted</button>
+                                    <button class="filter-btn" data-filter="Quoted">Quoted</button>
+                                    <button class="filter-btn" data-filter="Won">Won</button>
+                                </div>
+                                <a href="/api/leads/export" class="export-btn" style="background: #1e293b; color: #fff; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.1);"><i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Export</a>
                             </div>
                             <div class="leads-list-scroll">
                                 <div class="leads-loading text-center" id="leads-list-loading">

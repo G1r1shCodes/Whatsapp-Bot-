@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Request
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 from pydantic import BaseModel
 import db
 import ai
 import re
 import json
 import auth
+import io
+import csv
 
 router = APIRouter()
 
@@ -88,6 +90,44 @@ async def api_test_chat(msg: TestChatMessage, request: Request):
 async def get_leads_api(request: Request, status: str = None, search: str = None):
     auth.require_auth(request)
     return db.get_leads(status_filter=status, search_query=search)
+
+@router.get("/api/leads/export")
+async def export_leads_csv(request: Request):
+    auth.require_auth(request)
+    leads = db.get_leads()
+    
+    # Create an in-memory string buffer for the CSV
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Write header
+    writer.writerow([
+        "Lead ID", "Phone Number", "Name", "Company", "Location", 
+        "Product Interest", "Quantity", "Status", "Created At", "Updated At"
+    ])
+    
+    # Write data
+    for lead in leads:
+        writer.writerow([
+            lead.get("id"),
+            lead.get("phone_number"),
+            lead.get("name"),
+            lead.get("company"),
+            lead.get("location"),
+            lead.get("product_interest"),
+            lead.get("quantity"),
+            lead.get("status"),
+            lead.get("created_at"),
+            lead.get("updated_at")
+        ])
+        
+    output.seek(0)
+    
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=kdi_leads_export.csv"}
+    )
 
 @router.patch("/api/leads/{lead_id}/status")
 async def update_lead_status_api(lead_id: int, request: Request):

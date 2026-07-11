@@ -84,7 +84,7 @@ def send_whatsapp_message(to_phone: str, text: str, image_url: str = None, show_
                             "type": "reply",
                             "reply": {
                                 "id": "menu_contact",
-                                "title": "Contact Sales"
+                                "title": "Call Us"
                             }
                         }
                     ]
@@ -204,7 +204,7 @@ def process_incoming_message(from_number: str, incoming_msg: str, profile_name: 
         menu_match = False
         cat_match = False
         
-        if lower_msg == "contact sales":
+        if lower_msg in ["contact sales", "call us"]:
             reply_text = "📍 *Factory Address*\nH-1243, DSIDC Industrial Area,\nNarela, New Delhi - 110040\n\n🏢 *Corporate Office / Registered Office*\n912, 9th Floor, D Mall, Netaji Subhash Place, Pitampura, Delhi - 110034\n\n📞 *+91-8043863456*\n👤 Vipul Kumar — Marketing Manager"
         elif lower_msg == "track my inquiry":
             lead = db.get_lead_by_phone(from_number)
