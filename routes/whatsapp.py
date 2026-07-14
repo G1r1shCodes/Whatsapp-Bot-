@@ -288,7 +288,7 @@ def process_incoming_message(from_number: str, incoming_msg: str, profile_name: 
                         requirements=f"Captured via AI chatbot. Qty: {lead_data.get('quantity')}. Loc: {lead_data.get('location')}."
                     )
                     cleaned_text = re.sub(r'\[LEAD_SUBMIT:\s*\{.*?\}\s*\]', '', ai_response, flags=re.DOTALL).strip()
-                    success_msg = f"🎉 *Inquiry Submitted Successfully!*\n\n🔹 *Inquiry ID:* #{lead_id}\n\nOur sales representatives are reviewing your requirements and will reach out shortly."
+                    success_msg = f"🎉 *Inquiry Submitted Successfully!*\n\nOur sales representatives are reviewing your requirements and will reach out shortly."
                     reply_text = f"{cleaned_text}\n\n{success_msg}" if cleaned_text else success_msg
                 except Exception as e:
                     logger.error(f"Error parsing LEAD_SUBMIT tag: {e}")

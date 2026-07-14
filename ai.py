@@ -181,4 +181,4 @@ def get_ai_response(phone, profile_name):
             logger.error(f"Unexpected error calling Groq API: {e}")
             break
             
-    return "Sorry, I am experiencing a temporary technical issue. Please try again shortly or contact KDI Power support directly at +91 98765 43210."
+    return "Sorry, I am experiencing a temporary technical issue. Please try again shortly or contact KDI Power support directly at +91-9205333843."

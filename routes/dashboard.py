@@ -68,7 +68,7 @@ async def api_test_chat(msg: TestChatMessage, request: Request):
                 requirements=f"Captured via AI chatbot. Qty: {lead_data.get('quantity')}. Loc: {lead_data.get('location')}."
             )
             cleaned_text = re.sub(r'\[LEAD_SUBMIT:\s*\{.*?\}\s*\]', '', ai_response, flags=re.DOTALL).strip()
-            success_msg = f"🎉 *Inquiry Submitted Successfully!*\n\n🔹 *Inquiry ID:* #{lead_id}"
+            success_msg = "🎉 *Inquiry Submitted Successfully!*\n\nOur sales representatives are reviewing your requirements and will reach out shortly."
             reply_text = f"{cleaned_text}\n\n{success_msg}" if cleaned_text else success_msg
         except Exception:
             reply_text = "I encountered an error submitting your quote request. Please try again."
