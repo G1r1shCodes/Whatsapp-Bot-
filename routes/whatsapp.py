@@ -231,6 +231,7 @@ def process_incoming_message(from_number: str, incoming_msg: str, profile_name: 
             
             # Parse specific tags
             submit_match = re.search(r'\[LEAD_SUBMIT:\s*(\{.*?\})\s*\]', ai_response, re.DOTALL)
+            partial_match = re.search(r'\[LEAD_PARTIAL:\s*(\{.*?\})\s*\]', ai_response, re.DOTALL)
             status_match = "[LEAD_STATUS_CHECK]" in ai_response
             menu_match = "[SHOW_MAIN_MENU]" in ai_response
             image_match = re.search(r'\[IMAGE:\s*(.+?)\s*\]', ai_response)
@@ -242,23 +243,19 @@ def process_incoming_message(from_number: str, incoming_msg: str, profile_name: 
                 image_file = image_match.group(1).strip()
                 reply_text = re.sub(r'\[IMAGE:\s*.+?\s*\]', '', reply_text).strip()
 
+            if partial_match:
+                try:
+                    lead_data = json.loads(partial_match.group(1))
+                    db.upsert_lead_from_chat(phone=from_number, profile_name=profile_name, lead_data=lead_data, status="Partial")
+                    reply_text = re.sub(r'\[LEAD_PARTIAL:\s*\{.*?\}\s*\]', '', reply_text, flags=re.DOTALL).strip()
+                except Exception as e:
+                    logger.error(f"Error parsing LEAD_PARTIAL tag: {e}")
+
             if submit_match:
                 try:
                     lead_data = json.loads(submit_match.group(1))
-                    # Validate required fields
-                    if not lead_data.get("name") or not lead_data.get("product"):
-                        raise ValueError("Missing required lead fields: name and product")
-                    lead_id = db.create_lead(
-                        phone=from_number,
-                        name=lead_data.get("name", "Unknown")[:200],
-                        company=lead_data.get("company", "Individual")[:200],
-                        email="",
-                        location=lead_data.get("location", "Unknown")[:200],
-                        product_interest=lead_data.get("product", "Unknown")[:200],
-                        quantity=lead_data.get("quantity", "Unknown")[:100],
-                        requirements=f"Captured via AI chatbot. Qty: {lead_data.get('quantity')}. Loc: {lead_data.get('location')}."
-                    )
-                    cleaned_text = re.sub(r'\[LEAD_SUBMIT:\s*\{.*?\}\s*\]', '', ai_response, flags=re.DOTALL).strip()
+                    db.upsert_lead_from_chat(phone=from_number, profile_name=profile_name, lead_data=lead_data, status="New")
+                    cleaned_text = re.sub(r'\[LEAD_SUBMIT:\s*\{.*?\}\s*\]', '', reply_text, flags=re.DOTALL).strip()
                     success_msg = f"🎉 *Inquiry Submitted Successfully!*\n\nOur sales representatives are reviewing your requirements and will reach out shortly."
                     reply_text = f"{cleaned_text}\n\n{success_msg}" if cleaned_text else success_msg
                 except Exception as e:

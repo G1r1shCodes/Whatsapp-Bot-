@@ -118,6 +118,40 @@ def create_lead(phone, name, company, email, location, product_interest, quantit
         return res[0]["id"]
     return None
 
+def upsert_lead_from_chat(phone, profile_name, lead_data, status):
+    existing = get_lead_by_phone(phone)
+    
+    if existing and existing.get("status") in ["New", "Partial"]:
+        data = {
+            "name": lead_data.get("name", existing.get("name", profile_name))[:200],
+            "company": lead_data.get("company", existing.get("company", "Unknown"))[:200],
+            "location": lead_data.get("location", existing.get("location", "Unknown"))[:200],
+            "product_interest": lead_data.get("product", existing.get("product_interest", "Unknown"))[:200],
+            "quantity": lead_data.get("quantity", existing.get("quantity", "Unknown"))[:100],
+            "status": status,
+            "updated_at": datetime.utcnow().isoformat() + "Z"
+        }
+        request_supabase("leads", "PATCH", data=data, params={"id": f"eq.{existing['id']}"})
+        return existing["id"]
+    else:
+        data = {
+            "phone": phone,
+            "name": lead_data.get("name", profile_name)[:200],
+            "company": lead_data.get("company", "Unknown")[:200],
+            "email": "",
+            "location": lead_data.get("location", "Unknown")[:200],
+            "product_interest": lead_data.get("product", "Unknown")[:200],
+            "quantity": lead_data.get("quantity", "Unknown")[:100],
+            "requirements": "Captured via AI chatbot.",
+            "status": status,
+            "created_at": datetime.utcnow().isoformat() + "Z",
+            "updated_at": datetime.utcnow().isoformat() + "Z"
+        }
+        res = request_supabase("leads", "POST", data=data)
+        if res:
+            return res[0]["id"]
+        return None
+
 def get_leads(status_filter=None, search_query=None):
     params = {"order": "created_at.desc"}
     if status_filter:
