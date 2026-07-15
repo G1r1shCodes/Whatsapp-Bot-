@@ -146,10 +146,10 @@ async function loadAnalyticsData() {
         const data = await res.json();
         
         // Update Stats Counters with Animation
-        animateValue(document.getElementById('stat-total-leads'), 0, data.total_leads || 0, 1000);
-        animateValue(document.getElementById('stat-new-leads'), 0, data.new_leads || 0, 1000);
-        animateValue(document.getElementById('stat-quoted-leads'), 0, data.quoted_leads || 0, 1000);
-        animateValue(document.getElementById('stat-won-leads'), 0, data.won_leads || 0, 1000);
+        animateValue(document.getElementById('stat-total-leads'), 0, data.total_leads || 0, 400);
+        animateValue(document.getElementById('stat-new-leads'), 0, data.new_leads || 0, 400);
+        animateValue(document.getElementById('stat-quoted-leads'), 0, data.quoted_leads || 0, 400);
+        animateValue(document.getElementById('stat-won-leads'), 0, data.won_leads || 0, 400);
         
         // Load Charts
         renderProductChart(data.category_distribution || {});
