@@ -99,6 +99,7 @@ def delete_session(phone):
     request_supabase("sessions", "DELETE", params={"phone": f"eq.{phone}"})
 
 DUMMY_STATUS_OVERRIDES = {}
+DUMMY_PRODUCT_OVERRIDES = {}
 
 def get_static_dummy_leads():
     leads = []
@@ -209,6 +210,197 @@ def get_static_dummy_leads():
             "updated_at": updated_at
         })
     return leads
+
+def get_static_dummy_products():
+    return [
+        {
+            "name": "KDI 1.5 sq mm FR House Wire (Copper)",
+            "category": "House Wires",
+            "conductor": "Copper",
+            "size": "1.5 sq mm",
+            "core": 1,
+            "insulation": "PVC",
+            "price_per_meter": 24.50,
+            "stock_status": "In Stock",
+            "specifications": "Flame Retardant, Lead Free"
+        },
+        {
+            "name": "KDI 2.5 sq mm FRLS House Wire",
+            "category": "House Wires",
+            "conductor": "Copper",
+            "size": "2.5 sq mm",
+            "core": 1,
+            "insulation": "FRLS PVC",
+            "price_per_meter": 42.00,
+            "stock_status": "In Stock",
+            "specifications": "Flame Retardant Low Smoke"
+        },
+        {
+            "name": "KDI Solar Cable 4 sq mm DC",
+            "category": "Solar Cables",
+            "conductor": "Copper",
+            "size": "4.0 sq mm",
+            "core": 1,
+            "insulation": "XLPE",
+            "price_per_meter": 55.00,
+            "stock_status": "In Stock",
+            "specifications": "UV Resistant, DC Solar Application"
+        },
+        {
+            "name": "KDI Solar Cable 6 sq mm UV Resistant",
+            "category": "Solar Cables",
+            "conductor": "Copper",
+            "size": "6.0 sq mm",
+            "core": 1,
+            "insulation": "XLPE",
+            "price_per_meter": 82.50,
+            "stock_status": "In Stock",
+            "specifications": "TUV certified, UV Resistant"
+        },
+        {
+            "name": "KDI Submersible Cable 3 Core 2.5 sq mm",
+            "category": "Submersible Cables",
+            "conductor": "Copper",
+            "size": "2.5 sq mm",
+            "core": 3,
+            "insulation": "PVC",
+            "price_per_meter": 115.00,
+            "stock_status": "In Stock",
+            "specifications": "Flat pump cable"
+        },
+        {
+            "name": "KDI 3 Core Flat Submersible Cable 4 sq mm",
+            "category": "Submersible Cables",
+            "conductor": "Copper",
+            "size": "4.0 sq mm",
+            "core": 3,
+            "insulation": "PVC",
+            "price_per_meter": 168.00,
+            "stock_status": "In Stock",
+            "specifications": "Heavy duty flat pump cable"
+        },
+        {
+            "name": "Copper Control Cable 4 Core 1.5 sq mm",
+            "category": "Control Cables",
+            "conductor": "Copper",
+            "size": "1.5 sq mm",
+            "core": 4,
+            "insulation": "PVC",
+            "price_per_meter": 95.00,
+            "stock_status": "In Stock",
+            "specifications": "Industrial control applications"
+        },
+        {
+            "name": "Copper Control Cable 10 Core 2.5 sq mm",
+            "category": "Control Cables",
+            "conductor": "Copper",
+            "size": "2.5 sq mm",
+            "core": 10,
+            "insulation": "PVC",
+            "price_per_meter": 280.00,
+            "stock_status": "Custom Only",
+            "specifications": "Multi-core industrial signal cable"
+        },
+        {
+            "name": "Copper Flexible Cable 3 Core 1.5 sq mm",
+            "category": "Flexible Cables",
+            "conductor": "Copper",
+            "size": "1.5 sq mm",
+            "core": 3,
+            "insulation": "PVC",
+            "price_per_meter": 72.00,
+            "stock_status": "In Stock",
+            "specifications": "Multistrand flexible cord"
+        },
+        {
+            "name": "Flexible PVC Insulated Cord Cable 2 Core",
+            "category": "Flexible Cables",
+            "conductor": "Copper",
+            "size": "1.0 sq mm",
+            "core": 2,
+            "insulation": "PVC",
+            "price_per_meter": 38.00,
+            "stock_status": "In Stock",
+            "specifications": "Light duty twin flat cord"
+        },
+        {
+            "name": "11kV HT Armoured Cable 3C x 95 sq mm",
+            "category": "HT Cables",
+            "conductor": "Aluminium",
+            "size": "95 sq mm",
+            "core": 3,
+            "insulation": "XLPE",
+            "price_per_meter": 1250.00,
+            "stock_status": "Custom Only",
+            "specifications": "11kV high voltage power distribution"
+        },
+        {
+            "name": "33kV HT Armoured Cable XLPE",
+            "category": "HT Cables",
+            "conductor": "Aluminium",
+            "size": "240 sq mm",
+            "core": 3,
+            "insulation": "XLPE",
+            "price_per_meter": 3450.00,
+            "stock_status": "Custom Only",
+            "specifications": "33kV HT power transmission"
+        },
+        {
+            "name": "Copper Conductor XLPE Armoured Cable 4C x 16 sq mm",
+            "category": "Copper Armoured Cables",
+            "conductor": "Copper",
+            "size": "16 sq mm",
+            "core": 4,
+            "insulation": "XLPE",
+            "price_per_meter": 890.00,
+            "stock_status": "In Stock",
+            "specifications": "Low voltage copper armoured"
+        },
+        {
+            "name": "Aluminium XLPE Armoured Cable 4C x 50 sq mm",
+            "category": "Aluminium Armoured Cables",
+            "conductor": "Aluminium",
+            "size": "50 sq mm",
+            "core": 4,
+            "insulation": "XLPE",
+            "price_per_meter": 320.00,
+            "stock_status": "In Stock",
+            "specifications": "Low voltage aluminium armoured"
+        },
+        {
+            "name": "Thermocouple Extension Cable KX Type",
+            "category": "Thermocouple Cables",
+            "conductor": "Chromel/Alumel",
+            "size": "1.5 sq mm",
+            "core": 2,
+            "insulation": "PVC",
+            "price_per_meter": 145.00,
+            "stock_status": "In Stock",
+            "specifications": "KX Type extension wire"
+        },
+        {
+            "name": "Wind Power Energy Cable 3C x 150 sq mm",
+            "category": "Wind Power Cables",
+            "conductor": "Copper",
+            "size": "150 sq mm",
+            "core": 3,
+            "insulation": "EPR",
+            "price_per_meter": 4200.00,
+            "stock_status": "Custom Only",
+            "specifications": "Flexible torsion-resistant wind cable"
+        },
+        {
+            "name": "Triple Coated Multistrand House Wire 1.5 sq mm",
+            "category": "Triple Coating Cables",
+            "conductor": "Copper",
+            "size": "1.5 sq mm",
+            "core": 1,
+            "insulation": "Triple Layer PVC",
+            "price_per_meter": 28.50,
+            "stock_status": "In Stock",
+            "specifications": "Extra safety triple sheath"
+        }
+    ]
 
 def is_dummy_phone(phone):
     if not phone:
@@ -465,13 +657,49 @@ def get_all_products(category_filter=None):
     params = {}
     if category_filter:
         params["category"] = f"eq.{category_filter}"
-    return request_supabase("products", "GET", params=params)
+    
+    products = request_supabase("products", "GET", params=params)
+    if not products:
+        dummy_products = get_static_dummy_products()
+        # Apply in-memory overrides
+        for dp in dummy_products:
+            name = dp["name"]
+            if name in DUMMY_PRODUCT_OVERRIDES:
+                overrides = DUMMY_PRODUCT_OVERRIDES[name]
+                if "price" in overrides:
+                    dp["price_per_meter"] = overrides["price"]
+                if "stock_status" in overrides:
+                    dp["stock_status"] = overrides["stock_status"]
+        # Apply category filter
+        if category_filter:
+            dummy_products = [p for p in dummy_products if p["category"] == category_filter]
+        return dummy_products
+    return products
 
 def get_product_by_id(product_name):
     res = request_supabase("products", "GET", params={"name": f"eq.{product_name}"})
+    if not res:
+        dummy_products = get_static_dummy_products()
+        matches = [p for p in dummy_products if p["name"] == product_name]
+        if matches:
+            dp = matches[0]
+            if product_name in DUMMY_PRODUCT_OVERRIDES:
+                overrides = DUMMY_PRODUCT_OVERRIDES[product_name]
+                if "price" in overrides:
+                    dp["price_per_meter"] = overrides["price"]
+                if "stock_status" in overrides:
+                    dp["stock_status"] = overrides["stock_status"]
+            return dp
+        return None
     return res[0] if res else None
 
 def update_product_price_and_stock(product_name, price, stock_status):
+    # Store in-memory override
+    DUMMY_PRODUCT_OVERRIDES[product_name] = {
+        "price": price,
+        "stock_status": stock_status
+    }
+    
     data = {
         "price_per_meter": price,
         "stock_status": stock_status

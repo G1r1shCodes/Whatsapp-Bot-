@@ -161,15 +161,18 @@
                                 <i class="fa-solid fa-magnifying-glass"></i>
                                 <input type="text" id="lead-search-input" placeholder="Search leads by name, company, phone...">
                             </div>
-                            <div class="inbox-filters" style="display: flex; justify-content: space-between; align-items: center; padding-right: 15px;">
-                                <div>
+                            <div class="inbox-filters-container" style="display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem 1rem 1.25rem; gap: 0.5rem;">
+                                <div class="inbox-filters" style="display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; flex-grow: 1; padding: 0.25rem 0;">
                                     <button class="filter-btn active" data-filter="All">All</button>
                                     <button class="filter-btn" data-filter="New">New</button>
                                     <button class="filter-btn" data-filter="Contacted">Contacted</button>
                                     <button class="filter-btn" data-filter="Quoted">Quoted</button>
                                     <button class="filter-btn" data-filter="Won">Won</button>
+                                    <button class="filter-btn" data-filter="Lost">Lost</button>
                                 </div>
-                                <a href="/api/leads/export" class="export-btn" style="background: #1e293b; color: #fff; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.1);"><i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Export</a>
+                                <a href="/api/leads/export" class="export-btn" title="Export Leads to CSV" style="flex-shrink: 0; background: #1e293b; color: #fff; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; height: 32px; border: 1px solid rgba(255,255,255,0.1); transition: var(--transition-smooth);" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">
+                                    <i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Export
+                                </a>
                             </div>
                             <div class="leads-list-scroll">
                                 <div class="leads-loading text-center" id="leads-list-loading">
