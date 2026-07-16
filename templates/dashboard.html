@@ -69,9 +69,6 @@
                     <p class="text-secondary" id="page-subtitle">Real-time performance and insights</p>
                 </div>
                 <div class="header-actions">
-                    <a href="/api/leads/export" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
-                        <i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Export Leads
-                    </a>
                     <button class="btn btn-secondary" id="refresh-data-btn">
                         <i class="fa-solid fa-arrows-rotate"></i> Refresh
                     </button>
@@ -160,6 +157,12 @@
                     <div class="inbox-layout">
                         <!-- Leads List Panel -->
                         <div class="leads-list-panel card">
+                            <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.25rem 0.25rem 1.25rem;">
+                                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--text-primary);">Leads Directory</h3>
+                                <a href="/api/leads/export" class="export-btn" title="Export Leads to CSV" style="background: #1e293b; color: #fff; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.1); transition: var(--transition-smooth);" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">
+                                    <i class="fa-solid fa-file-excel" style="color: #10b981;"></i> Export
+                                </a>
+                            </div>
                             <div class="inbox-search">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                                 <input type="text" id="lead-search-input" placeholder="Search leads by name, company, phone...">
