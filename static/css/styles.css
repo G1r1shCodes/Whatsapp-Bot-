@@ -454,11 +454,10 @@ body {
 }
 
 .inbox-filters {
-    padding: 0 1.25rem 1.25rem 1.25rem;
+    padding: 0 1.25rem 1rem 1.25rem;
     display: flex;
-    gap: 0.5rem;
-    overflow-x: auto;
-    scrollbar-width: none;
+    flex-wrap: wrap;
+    gap: 0.4rem;
 }
 
 .inbox-filters::-webkit-scrollbar {
@@ -469,9 +468,9 @@ body {
     background: transparent;
     border: 1px solid var(--border);
     color: var(--text-secondary);
-    padding: 0.4rem 0.85rem;
+    padding: 0.35rem 0.65rem;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 500;
     cursor: pointer;
     transition: var(--transition-smooth);
