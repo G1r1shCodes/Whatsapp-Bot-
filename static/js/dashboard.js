@@ -510,6 +510,17 @@ async function loadCatalogData() {
         const res = await fetch('/api/products');
         catalogData = await res.json();
         
+        // Dynamically rebuild category dropdown filter options to match actual product data
+        if (catalogData.length > 0) {
+            const uniqueCategories = ['All', ...new Set(catalogData.map(p => p.category).filter(Boolean))].sort();
+            const currentSelected = categorySelect.value;
+            categorySelect.innerHTML = uniqueCategories.map(cat => {
+                const label = cat === 'All' ? 'All Categories' : cat;
+                const selected = cat === currentSelected ? 'selected' : '';
+                return `<option value="${cat}" ${selected}>${label}</option>`;
+            }).join('');
+        }
+        
         const filter = categorySelect.value;
         const filteredProducts = filter === 'All' 
             ? catalogData 
@@ -534,6 +545,10 @@ async function loadCatalogData() {
                 return `<option value="${opt}" ${selected}>${opt}</option>`;
             }).join('');
             
+            let stockClass = 'stock-in';
+            if (product.stock_status === 'Out of Stock') stockClass = 'stock-out';
+            else if (product.stock_status === 'Custom Only') stockClass = 'stock-custom';
+            
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><span class="text-secondary">${product.category}</span></td>
@@ -543,11 +558,11 @@ async function loadCatalogData() {
                 <td>${product.core} core</td>
                 <td>
                     <span class="editable-price" data-name="${product.name}">
-                        ${product.price_per_meter !== null ? 'INR ' + product.price_per_meter.toFixed(2) : 'N/A'}
+                        ${product.price_per_meter !== null ? 'INR ' + product.price_per_meter.toFixed(2) : 'N/A'} <i class="fa-solid fa-pen" style="font-size: 0.65rem; opacity: 0.4; margin-left: 4px;"></i>
                     </span>
                 </td>
                 <td>
-                    <select class="catalog-status-select" data-name="${product.name}">
+                    <select class="catalog-status-select ${stockClass}" data-name="${product.name}">
                         ${stockOptions}
                     </select>
                 </td>
@@ -663,6 +678,12 @@ async function updateProductStock(productName, stockStatus, selectElement) {
         if (res.ok) {
             showToast(`Updated stock status for ${productName} to "${stockStatus}"`);
             if (localProd) localProd.stock_status = stockStatus;
+            
+            // Dynamically update background class color coding
+            selectElement.className = 'catalog-status-select';
+            if (stockStatus === 'In Stock') selectElement.classList.add('stock-in');
+            else if (stockStatus === 'Out of Stock') selectElement.classList.add('stock-out');
+            else if (stockStatus === 'Custom Only') selectElement.classList.add('stock-custom');
         } else {
             showToast('Failed to update stock status', true);
             // Revert value
