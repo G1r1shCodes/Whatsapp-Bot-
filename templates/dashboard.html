@@ -20,8 +20,8 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="brand">
-                <div class="brand-logo">
-                    <i class="fa-solid fa-bolt brand-icon"></i>
+                <div class="brand-logo" style="background: transparent; box-shadow: none; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
+                    <img src="/static/images/kdi-logo-white.png" alt="KDI Power Logo" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                 </div>
                 <div class="brand-info">
                     <h2>KDI Power</h2>
@@ -171,6 +171,7 @@
                                 <button class="filter-btn" data-filter="Quoted">Quoted</button>
                                 <button class="filter-btn" data-filter="Won">Won</button>
                                 <button class="filter-btn" data-filter="Lost">Lost</button>
+                                <button class="filter-btn" data-filter="Partial">Partial</button>
                             </div>
                             <div class="leads-list-scroll">
                                 <div class="leads-loading text-center" id="leads-list-loading">
@@ -206,6 +207,7 @@
                                             <option value="Quoted">Quoted</option>
                                             <option value="Won">Won</option>
                                             <option value="Lost">Lost</option>
+                                            <option value="Partial">Partial</option>
                                         </select>
                                     </div>
                                 </div>

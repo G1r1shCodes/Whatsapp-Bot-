@@ -109,24 +109,25 @@ def get_static_dummy_leads():
         {"product": "KDI 2.5 sq mm FRLS House Wire", "category": "House Wires"},
         {"product": "KDI 1.0 sq mm PVC Insulated Wire", "category": "House Wires"},
         {"product": "Single Core 4.0 sq mm House Wire", "category": "House Wires"},
-        {"product": "KDI Solar Cable 4 sq mm DC", "category": "Solar Cables"},
-        {"product": "KDI Solar Cable 6 sq mm UV Resistant", "category": "Solar Cables"},
-        {"product": "KDI Submersible Cable 3 Core 2.5 sq mm", "category": "Submersible Cables"},
-        {"product": "KDI 3 Core Flat Submersible Cable 4 sq mm", "category": "Submersible Cables"},
+        {"product": "KDI Solar Cable 4 sq mm DC", "category": "Power Cable"},
+        {"product": "KDI Solar Cable 6 sq mm UV Resistant", "category": "Power Cable"},
+        {"product": "KDI Submersible Cable 3 Core 2.5 sq mm", "category": "Rubber Cable"},
+        {"product": "KDI 3 Core Flat Submersible Cable 4 sq mm", "category": "Rubber Cable"},
         {"product": "Copper Control Cable 4 Core 1.5 sq mm", "category": "Control Cables"},
         {"product": "Copper Control Cable 10 Core 2.5 sq mm", "category": "Control Cables"},
-        {"product": "Copper Flexible Cable 3 Core 1.5 sq mm", "category": "Flexible Cables"},
-        {"product": "Flexible PVC Insulated Cord Cable 2 Core", "category": "Flexible Cables"},
-        {"product": "11kV HT Armoured Cable 3C x 95 sq mm", "category": "HT Cables"},
-        {"product": "33kV HT Armoured Cable XLPE", "category": "HT Cables"},
-        {"product": "Copper Conductor XLPE Armoured Cable 4C x 16 sq mm", "category": "Copper Armoured Cables"},
-        {"product": "Copper Armoured Cable 3 Core 35 sq mm", "category": "Copper Armoured Cables"},
-        {"product": "Aluminium XLPE Armoured Cable 4C x 50 sq mm", "category": "Aluminium Armoured Cables"},
-        {"product": "Aluminium Power Cable 3.5 Core 120 sq mm", "category": "Aluminium Armoured Cables"},
-        {"product": "Thermocouple Extension Cable KX Type", "category": "Thermocouple Cables"},
-        {"product": "Compensating Cable J Type Shielded", "category": "Thermocouple Cables"},
-        {"product": "Wind Power Energy Cable 3C x 150 sq mm", "category": "Wind Power Cables"},
-        {"product": "Triple Coated Multistrand House Wire 1.5 sq mm", "category": "Triple Coating Cables"},
+        {"product": "Copper Flexible Cable 3 Core 1.5 sq mm", "category": "Rubber Cable"},
+        {"product": "Flexible PVC Insulated Cord Cable 2 Core", "category": "Rubber Cable"},
+        {"product": "11kV HT Armoured Cable 3C x 95 sq mm", "category": "Power Cable"},
+        {"product": "33kV HT Armoured Cable XLPE", "category": "Power Cable"},
+        {"product": "Copper Conductor XLPE Armoured Cable 4C x 16 sq mm", "category": "Power Cable"},
+        {"product": "Copper Armoured Cable 3 Core 35 sq mm", "category": "Power Cable"},
+        {"product": "Aluminium XLPE Armoured Cable 4C x 50 sq mm", "category": "Power Cable"},
+        {"product": "Aluminium Power Cable 3.5 Core 120 sq mm", "category": "Power Cable"},
+        {"product": "Thermocouple Extension Cable KX Type", "category": "Instrumentation Wires"},
+        {"product": "Compensating Cable J Type Shielded", "category": "Instrumentation Wires"},
+        {"product": "Wind Power Energy Cable 3C x 150 sq mm", "category": "Power Cable"},
+        {"product": "Triple Coated Multistrand House Wire 1.5 sq mm", "category": "House Wires"},
+        {"product": "KDI Aerial Bunched Cable 3C x 50 + 1C x 35 sq mm", "category": "Aerial Bunched Cable"},
     ]
     
     names = [
@@ -237,7 +238,7 @@ def get_static_dummy_products():
         },
         {
             "name": "KDI Solar Cable 4 sq mm DC",
-            "category": "Solar Cables",
+            "category": "Power Cable",
             "conductor": "Copper",
             "size": "4.0 sq mm",
             "core": 1,
@@ -248,7 +249,7 @@ def get_static_dummy_products():
         },
         {
             "name": "KDI Solar Cable 6 sq mm UV Resistant",
-            "category": "Solar Cables",
+            "category": "Power Cable",
             "conductor": "Copper",
             "size": "6.0 sq mm",
             "core": 1,
@@ -259,7 +260,7 @@ def get_static_dummy_products():
         },
         {
             "name": "KDI Submersible Cable 3 Core 2.5 sq mm",
-            "category": "Submersible Cables",
+            "category": "Rubber Cable",
             "conductor": "Copper",
             "size": "2.5 sq mm",
             "core": 3,
@@ -270,7 +271,7 @@ def get_static_dummy_products():
         },
         {
             "name": "KDI 3 Core Flat Submersible Cable 4 sq mm",
-            "category": "Submersible Cables",
+            "category": "Rubber Cable",
             "conductor": "Copper",
             "size": "4.0 sq mm",
             "core": 3,
@@ -303,7 +304,7 @@ def get_static_dummy_products():
         },
         {
             "name": "Copper Flexible Cable 3 Core 1.5 sq mm",
-            "category": "Flexible Cables",
+            "category": "Rubber Cable",
             "conductor": "Copper",
             "size": "1.5 sq mm",
             "core": 3,
@@ -314,7 +315,7 @@ def get_static_dummy_products():
         },
         {
             "name": "Flexible PVC Insulated Cord Cable 2 Core",
-            "category": "Flexible Cables",
+            "category": "Rubber Cable",
             "conductor": "Copper",
             "size": "1.0 sq mm",
             "core": 2,
@@ -325,7 +326,7 @@ def get_static_dummy_products():
         },
         {
             "name": "11kV HT Armoured Cable 3C x 95 sq mm",
-            "category": "HT Cables",
+            "category": "Power Cable",
             "conductor": "Aluminium",
             "size": "95 sq mm",
             "core": 3,
@@ -336,7 +337,7 @@ def get_static_dummy_products():
         },
         {
             "name": "33kV HT Armoured Cable XLPE",
-            "category": "HT Cables",
+            "category": "Power Cable",
             "conductor": "Aluminium",
             "size": "240 sq mm",
             "core": 3,
@@ -347,7 +348,7 @@ def get_static_dummy_products():
         },
         {
             "name": "Copper Conductor XLPE Armoured Cable 4C x 16 sq mm",
-            "category": "Copper Armoured Cables",
+            "category": "Power Cable",
             "conductor": "Copper",
             "size": "16 sq mm",
             "core": 4,
@@ -358,7 +359,7 @@ def get_static_dummy_products():
         },
         {
             "name": "Aluminium XLPE Armoured Cable 4C x 50 sq mm",
-            "category": "Aluminium Armoured Cables",
+            "category": "Power Cable",
             "conductor": "Aluminium",
             "size": "50 sq mm",
             "core": 4,
@@ -369,7 +370,7 @@ def get_static_dummy_products():
         },
         {
             "name": "Thermocouple Extension Cable KX Type",
-            "category": "Thermocouple Cables",
+            "category": "Instrumentation Wires",
             "conductor": "Chromel/Alumel",
             "size": "1.5 sq mm",
             "core": 2,
@@ -380,7 +381,7 @@ def get_static_dummy_products():
         },
         {
             "name": "Wind Power Energy Cable 3C x 150 sq mm",
-            "category": "Wind Power Cables",
+            "category": "Power Cable",
             "conductor": "Copper",
             "size": "150 sq mm",
             "core": 3,
@@ -391,7 +392,7 @@ def get_static_dummy_products():
         },
         {
             "name": "Triple Coated Multistrand House Wire 1.5 sq mm",
-            "category": "Triple Coating Cables",
+            "category": "House Wires",
             "conductor": "Copper",
             "size": "1.5 sq mm",
             "core": 1,
@@ -399,6 +400,17 @@ def get_static_dummy_products():
             "price_per_meter": 28.50,
             "stock_status": "In Stock",
             "specifications": "Extra safety triple sheath"
+        },
+        {
+            "name": "KDI Aerial Bunched Cable 3C x 50 + 1C x 35 sq mm",
+            "category": "Aerial Bunched Cable",
+            "conductor": "Aluminium",
+            "size": "50 sq mm",
+            "core": 4,
+            "insulation": "XLPE",
+            "price_per_meter": 185.00,
+            "stock_status": "In Stock",
+            "specifications": "Overhead distribution cable"
         }
     ]
 

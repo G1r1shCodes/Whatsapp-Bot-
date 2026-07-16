@@ -135,10 +135,10 @@ async def update_lead_status_api(lead_id: int, request: Request):
     auth.require_auth(request)
     payload = await request.json()
     status = payload.get("status")
-    ALLOWED_STATUSES = {"New", "Contacted", "Quoted", "Won", "Lost"}
+    ALLOWED_STATUSES = {"New", "Contacted", "Quoted", "Won", "Lost", "Partial"}
     if status not in ALLOWED_STATUSES:
         from fastapi import HTTPException
-        raise HTTPException(status_code=400, detail=f"Invalid status. Allowed: {', '.join(ALLOWED_STATUSES)}")
+        raise HTTPException(status_code=400, detail=f"Invalid status. Allowed: {', '.join(sorted(list(ALLOWED_STATUSES)))}")
     db.update_lead_status(lead_id, status)
     return {"success": True, "lead_id": lead_id, "status": status}
 
@@ -188,38 +188,18 @@ async def get_stats_api(request: Request):
         cat = prod_to_cat.get(prod)
         if not cat:
             prod_lower = prod.lower()
-            if "solar" in prod_lower:
-                cat = "Solar Cables"
-            elif "submersible" in prod_lower or "sub " in prod_lower:
-                cat = "Submersible Cables"
-            elif "control" in prod_lower:
+            if "control" in prod_lower:
                 cat = "Control Cables"
-            elif "flexible" in prod_lower or "cord" in prod_lower:
-                cat = "Flexible Cables"
-            elif "ht cable" in prod_lower or "high tension" in prod_lower or "11kv" in prod_lower or "33kv" in prod_lower:
-                cat = "HT Cables"
-            elif "armoured" in prod_lower or "armored" in prod_lower:
-                if "copper" in prod_lower:
-                    cat = "Copper Armoured Cables"
-                elif "aluminium" in prod_lower or "aluminum" in prod_lower:
-                    cat = "Aluminium Armoured Cables"
-                else:
-                    cat = "Armoured Cables"
-            elif "unarmoured" in prod_lower or "unarmored" in prod_lower:
-                if "copper" in prod_lower:
-                    cat = "Copper Unarmoured Cables"
-                else:
-                    cat = "Aluminium Unarmoured Cables"
-            elif "thermocouple" in prod_lower:
-                cat = "Thermocouple Cables"
-            elif "wind" in prod_lower:
-                cat = "Wind Power Cables"
-            elif "triple" in prod_lower:
-                cat = "Triple Coating Cables"
-            elif "house" in prod_lower or "fr" in prod_lower or "wire" in prod_lower:
+            elif "aerial" in prod_lower or "bunched" in prod_lower or "abc" in prod_lower:
+                cat = "Aerial Bunched Cable"
+            elif "submersible" in prod_lower or "flexible" in prod_lower or "cord" in prod_lower or "trailing" in prod_lower or "rubber" in prod_lower:
+                cat = "Rubber Cable"
+            elif "thermocouple" in prod_lower or "instrumentation" in prod_lower or "compensating" in prod_lower or "shielded" in prod_lower:
+                cat = "Instrumentation Wires"
+            elif "house" in prod_lower or "fr" in prod_lower or "wire" in prod_lower or "triple" in prod_lower:
                 cat = "House Wires"
             else:
-                cat = "Power Cables"
+                cat = "Power Cable"
         
         categories[cat] = categories.get(cat, 0) + 1
         

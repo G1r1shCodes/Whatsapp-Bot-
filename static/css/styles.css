@@ -566,6 +566,7 @@ body {
 .status-badge.quoted { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); }
 .status-badge.won { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
 .status-badge.lost { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+.status-badge.partial { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
 
 .lead-item-body {
     display: flex;
