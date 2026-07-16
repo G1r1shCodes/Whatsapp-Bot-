@@ -2,7 +2,7 @@ import os
 import json
 import urllib.request
 import urllib.parse
-from datetime import datetime
+from datetime import datetime, timedelta
 # Helper to load .env variables manually
 def load_env():
     env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
@@ -98,6 +98,257 @@ def save_session(phone, current_state, state_data):
 def delete_session(phone):
     request_supabase("sessions", "DELETE", params={"phone": f"eq.{phone}"})
 
+DUMMY_STATUS_OVERRIDES = {}
+
+def get_static_dummy_leads():
+    leads = []
+    
+    product_pool = [
+        {"product": "KDI 1.5 sq mm FR House Wire (Copper)", "category": "House Wires"},
+        {"product": "KDI 2.5 sq mm FRLS House Wire", "category": "House Wires"},
+        {"product": "KDI 1.0 sq mm PVC Insulated Wire", "category": "House Wires"},
+        {"product": "Single Core 4.0 sq mm House Wire", "category": "House Wires"},
+        {"product": "KDI Solar Cable 4 sq mm DC", "category": "Solar Cables"},
+        {"product": "KDI Solar Cable 6 sq mm UV Resistant", "category": "Solar Cables"},
+        {"product": "KDI Submersible Cable 3 Core 2.5 sq mm", "category": "Submersible Cables"},
+        {"product": "KDI 3 Core Flat Submersible Cable 4 sq mm", "category": "Submersible Cables"},
+        {"product": "Copper Control Cable 4 Core 1.5 sq mm", "category": "Control Cables"},
+        {"product": "Copper Control Cable 10 Core 2.5 sq mm", "category": "Control Cables"},
+        {"product": "Copper Flexible Cable 3 Core 1.5 sq mm", "category": "Flexible Cables"},
+        {"product": "Flexible PVC Insulated Cord Cable 2 Core", "category": "Flexible Cables"},
+        {"product": "11kV HT Armoured Cable 3C x 95 sq mm", "category": "HT Cables"},
+        {"product": "33kV HT Armoured Cable XLPE", "category": "HT Cables"},
+        {"product": "Copper Conductor XLPE Armoured Cable 4C x 16 sq mm", "category": "Copper Armoured Cables"},
+        {"product": "Copper Armoured Cable 3 Core 35 sq mm", "category": "Copper Armoured Cables"},
+        {"product": "Aluminium XLPE Armoured Cable 4C x 50 sq mm", "category": "Aluminium Armoured Cables"},
+        {"product": "Aluminium Power Cable 3.5 Core 120 sq mm", "category": "Aluminium Armoured Cables"},
+        {"product": "Thermocouple Extension Cable KX Type", "category": "Thermocouple Cables"},
+        {"product": "Compensating Cable J Type Shielded", "category": "Thermocouple Cables"},
+        {"product": "Wind Power Energy Cable 3C x 150 sq mm", "category": "Wind Power Cables"},
+        {"product": "Triple Coated Multistrand House Wire 1.5 sq mm", "category": "Triple Coating Cables"},
+    ]
+    
+    names = [
+        "Rajesh Kumar", "Amit Sharma", "Sanjay Gupta", "Priya Patel", "Vikram Singh",
+        "Sunita Rao", "Deepak Mehta", "Anil Joshi", "Rahul Verma", "Sneha Reddy",
+        "Arjun Nair", "Manish Pandey", "Vijay Chawla", "Karan Malhotra", "Neha Gupta",
+        "Rohan Sobti", "Suresh Iyer", "Divya Deshmukh", "Abhishek Tiwari", "Pooja Hegde",
+        "Nitin Saxena", "Anjali Desai", "Rakesh Mishra", "Shweta Kapoor", "Harish Patel",
+        "Gaurav Sen", "Meera Krishnan", "Varun Dhawan", "Kiran Mazumdar", "Aditya Birla",
+        "Sandip Bose", "Kunal Kamra", "Rohit Shetty", "Ajay Devgn", "Siddharth Malhotra",
+        "Shraddha Kapoor", "Alia Bhatt", "Ranbir Kapoor", "Deepika Padukone", "Ranveer Singh",
+        "Pankaj Tripathi", "Manoj Bajpayee", "Nawazuddin Siddiqui", "Rajkummar Rao", "Ayushmann Khurrana",
+        "Vicky Kaushal", "Katrina Kaif", "Priyanka Chopra", "Nick Jonas", "Mahendra Singh Dhoni",
+        "Virat Kohli", "Sachin Tendulkar", "Rohit Sharma", "Jasprit Bumrah", "Hardik Pandya",
+        "Rishabh Pant", "Ravindra Jadeja", "Shikhar Dhawan", "Cheteshwar Pujara"
+    ]
+    
+    companies = [
+        "Apex Builders", "L&T Construction", "Tata Power", "Adani Energy", "Reliance Infrastructure",
+        "Siemens India", "Anchor Electricals", "Havells Distributor", "Sterling & Wilson", "Voltas Ltd",
+        "Bajaj Electricals", "KEC International", "Kalpataru Power", "Godrej Properties", "DLF Limited",
+        "Individual Contractor", "Local Retailer", "Electro Controls", "Power Grid Corp", "ABB India",
+        "GMR Infrastructure", "Shapoorji Pallonji", "JMC Projects", "NCC Limited", "Dilip Buildcon",
+        "Hindustan Construction", "Larsen & Toubro", "Tata Projects", "Engineers India", "BHEL"
+    ]
+    
+    locations = [
+        "Mumbai", "Delhi NCR", "Bangalore", "Chennai", "Hyderabad",
+        "Pune", "Ahmedabad", "Kolkata", "Noida Sector 62", "Gurgaon Phase 3",
+        "Jaipur", "Lucknow", "Coimbatore", "Surat", "Bhopal",
+        "Visakhapatnam", "Chandigarh", "Patna", "Indore", "Bhubaneswar",
+        "Nagpur", "Vadodara", "Thane", "Kochi", "Nashik",
+        "Faridabad", "Ghaziabad", "Rajkot", "Amritsar", "Jabalpur"
+    ]
+    
+    statuses = (
+        ["New"] * 15 +
+        ["Contacted"] * 12 +
+        ["Quoted"] * 10 +
+        ["Won"] * 8 +
+        ["Lost"] * 6 +
+        ["Partial"] * 8
+    )
+    
+    for i in range(59):
+        name = names[i % len(names)]
+        company = companies[(i * 3) % len(companies)]
+        location = locations[(i * 7) % len(locations)]
+        prod_info = product_pool[i % len(product_pool)]
+        status = statuses[i]
+        
+        # Override status if it exists
+        lead_id = 1000 + i
+        if lead_id in DUMMY_STATUS_OVERRIDES:
+            status = DUMMY_STATUS_OVERRIDES[lead_id]
+            
+        phone = f"9198765{i:03d}"
+        
+        qty_val = (i % 5 + 1) * 50
+        qty_unit = "coils" if "wire" in prod_info["product"].lower() else "meters"
+        quantity = f"{qty_val} {qty_unit}"
+        
+        requirements = f"Demo Lead {i+1}. Inquired for {prod_info['product']} ({quantity}) for site delivery at {location}."
+        
+        created_dt = datetime.utcnow() - timedelta(days=(59 - i) * 0.25)
+        created_at = created_dt.isoformat() + "Z"
+        updated_at = (created_dt + timedelta(hours=2)).isoformat() + "Z"
+        
+        leads.append({
+            "id": lead_id,
+            "phone": phone,
+            "name": name,
+            "company": company,
+            "email": f"{name.lower().replace(' ', '.')}@example.com",
+            "location": location,
+            "product_interest": prod_info["product"],
+            "quantity": quantity,
+            "requirements": requirements,
+            "status": status,
+            "created_at": created_at,
+            "updated_at": updated_at
+        })
+    return leads
+
+def is_dummy_phone(phone):
+    if not phone:
+        return False
+    cleaned = phone.replace("+", "").strip()
+    return cleaned.startswith("9198765") and len(cleaned) == 10
+
+def get_dummy_chat_history(phone):
+    cleaned = phone.replace("+", "").strip()
+    try:
+        idx = int(cleaned[-3:])
+    except Exception:
+        idx = 0
+        
+    dummies = get_static_dummy_leads()
+    lead = dummies[idx] if idx < len(dummies) else dummies[0]
+    
+    name = lead["name"]
+    product = lead["product_interest"]
+    qty = lead["quantity"]
+    loc = lead["location"]
+    status = lead["status"]
+    
+    history = []
+    base_time = datetime.fromisoformat(lead["created_at"].replace("Z", ""))
+    
+    history.append({
+        "phone": phone,
+        "direction": "inbound",
+        "body": "Hello, I am interested in purchasing some cables.",
+        "created_at": base_time.isoformat() + "Z"
+    })
+    
+    history.append({
+        "phone": phone,
+        "direction": "outbound",
+        "body": f"Hello {name}! 👋\nWelcome to *KDI Power*!\nI would be happy to help you with your query. Could you please specify which cable/wire you are looking for?",
+        "created_at": (base_time + timedelta(minutes=1)).isoformat() + "Z"
+    })
+    
+    history.append({
+        "phone": phone,
+        "direction": "inbound",
+        "body": f"I need {product}.",
+        "created_at": (base_time + timedelta(minutes=2)).isoformat() + "Z"
+    })
+    
+    history.append({
+        "phone": phone,
+        "direction": "outbound",
+        "body": f"Got it! What quantity of *{product}* do you require?",
+        "created_at": (base_time + timedelta(minutes=3)).isoformat() + "Z"
+    })
+    
+    history.append({
+        "phone": phone,
+        "direction": "inbound",
+        "body": f"We require around {qty}.",
+        "created_at": (base_time + timedelta(minutes=4)).isoformat() + "Z"
+    })
+    
+    history.append({
+        "phone": phone,
+        "direction": "outbound",
+        "body": "Understood. Please share your delivery location and company name if applicable.",
+        "created_at": (base_time + timedelta(minutes=5)).isoformat() + "Z"
+    })
+    
+    if status == "Partial":
+        return history
+        
+    history.append({
+        "phone": phone,
+        "direction": "inbound",
+        "body": f"Delivery is at {loc}. Company name is {lead['company']}.",
+        "created_at": (base_time + timedelta(minutes=6)).isoformat() + "Z"
+    })
+    
+    history.append({
+        "phone": phone,
+        "direction": "outbound",
+        "body": f"Thank you for the details, {name}. Your inquiry has been logged successfully with ID #{lead['id']}.\n\nOur sales representative will reach out to you shortly to provide the quote.",
+        "created_at": (base_time + timedelta(minutes=7)).isoformat() + "Z"
+    })
+    
+    if status == "New":
+        return history
+        
+    history.append({
+        "phone": phone,
+        "direction": "outbound",
+        "body": "📞 *Sales Representative Update*\nOur sales team has reviewed your inquiry and is preparing your quotation.",
+        "created_at": (base_time + timedelta(hours=1)).isoformat() + "Z"
+    })
+    
+    if status == "Contacted":
+        return history
+        
+    history.append({
+        "phone": phone,
+        "direction": "outbound",
+        "body": f"📄 *Quotation Sent*\nWe have emailed the quotation to {lead['email']}.\n\n*Summary:*\nProduct: {product}\nQuantity: {qty}\nPrice: Special Project Pricing applied.",
+        "created_at": (base_time + timedelta(hours=2)).isoformat() + "Z"
+    })
+    
+    if status == "Quoted":
+        return history
+        
+    if status == "Won":
+        history.append({
+            "phone": phone,
+            "direction": "inbound",
+            "body": "Thank you, we accept the quote and have processed the purchase order.",
+            "created_at": (base_time + timedelta(hours=3)).isoformat() + "Z"
+        })
+        history.append({
+            "phone": phone,
+            "direction": "outbound",
+            "body": "🎉 *Deal Closed!*\nPayment received. Dispatch is being scheduled. Thank you for doing business with KDI Power!",
+            "created_at": (base_time + timedelta(hours=3, minutes=10)).isoformat() + "Z"
+        })
+        return history
+        
+    if status == "Lost":
+        history.append({
+            "phone": phone,
+            "direction": "inbound",
+            "body": "Sorry, we have selected another vendor with a lower price.",
+            "created_at": (base_time + timedelta(hours=4)).isoformat() + "Z"
+        })
+        history.append({
+            "phone": phone,
+            "direction": "outbound",
+            "body": "Thank you for the update. We hope to work with you on future projects.",
+            "created_at": (base_time + timedelta(hours=4, minutes=5)).isoformat() + "Z"
+        })
+        return history
+        
+    return history
+
 # Lead Management helpers
 def create_lead(phone, name, company, email, location, product_interest, quantity, requirements):
     data = {
@@ -153,16 +404,38 @@ def upsert_lead_from_chat(phone, profile_name, lead_data, status):
         return None
 
 def get_leads(status_filter=None, search_query=None):
-    params = {"order": "created_at.desc"}
-    if status_filter:
-        params["status"] = f"eq.{status_filter}"
-    if search_query:
-        search_escaped = f"%{search_query}%"
-        params["or"] = f"(name.ilike.{search_escaped},phone.ilike.{search_escaped},company.ilike.{search_escaped},requirements.ilike.{search_escaped})"
+    real_leads = request_supabase("leads", "GET", params={"order": "created_at.desc"})
+    if not real_leads:
+        real_leads = []
         
-    return request_supabase("leads", "GET", params=params)
+    num_dummies = max(0, 59 - len(real_leads))
+    dummy_leads = get_static_dummy_leads()[:num_dummies]
+    
+    combined = real_leads + dummy_leads
+    combined.sort(key=lambda x: x.get("created_at") or "", reverse=True)
+    
+    if status_filter:
+        combined = [l for l in combined if l.get("status") == status_filter]
+        
+    if search_query:
+        q = search_query.lower()
+        combined = [
+            l for l in combined if (
+                q in (l.get("name") or "").lower() or
+                q in (l.get("phone") or "").lower() or
+                q in (l.get("company") or "").lower() or
+                q in (l.get("requirements") or "").lower() or
+                q in (l.get("product_interest") or "").lower() or
+                q in (l.get("location") or "").lower()
+            )
+        ]
+    return combined
 
 def update_lead_status(lead_id, status):
+    if lead_id >= 1000:
+        DUMMY_STATUS_OVERRIDES[lead_id] = status
+        return
+        
     data = {
         "status": status,
         "updated_at": datetime.utcnow().isoformat() + "Z"
@@ -170,6 +443,15 @@ def update_lead_status(lead_id, status):
     request_supabase("leads", "PATCH", data=data, params={"id": f"eq.{lead_id}"})
 
 def get_lead_by_phone(phone):
+    if is_dummy_phone(phone):
+        cleaned = phone.replace("+", "").strip()
+        try:
+            idx = int(cleaned[-3:])
+        except Exception:
+            idx = 0
+        dummies = get_static_dummy_leads()
+        return dummies[idx] if idx < len(dummies) else dummies[0]
+
     params = {
         "phone": f"eq.{phone}",
         "order": "created_at.desc",
@@ -225,6 +507,12 @@ def log_chat_message(phone, direction, body):
     request_supabase("chat_history", "POST", data=data)
 
 def get_chat_history(phone, limit=30):
+    if is_dummy_phone(phone):
+        res = get_dummy_chat_history(phone)
+        for row in res:
+            row["timestamp"] = row["created_at"]
+        return res
+
     params = {
         "phone": f"eq.{phone}",
         "order": "created_at.desc",

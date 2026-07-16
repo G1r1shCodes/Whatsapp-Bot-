@@ -154,8 +154,10 @@ async def get_stats_api(request: Request):
     
     total_leads = len(leads)
     new_leads = sum(1 for l in leads if l.get("status") == "New")
+    contacted_leads = sum(1 for l in leads if l.get("status") == "Contacted")
     quoted_leads = sum(1 for l in leads if l.get("status") == "Quoted")
     won_leads = sum(1 for l in leads if l.get("status") == "Won")
+    lost_leads = sum(1 for l in leads if l.get("status") == "Lost")
     
     # Category / Product interest distribution for charts
     categories = {}
@@ -163,24 +165,49 @@ async def get_stats_api(request: Request):
         prod = l.get("product_interest")
         if not prod:
             continue
-        # Extract general category or use the product interest itself
-        cat = "Custom Inquiry"
-        if "FR" in prod or "wire" in prod.lower() or "house" in prod.lower():
-            cat = "House Wires"
-        elif "armoured" in prod.lower() or "power" in prod.lower() or "xlpe" in prod.lower():
-            cat = "Power Cables"
-        elif "submersible" in prod.lower() or "sub" in prod.lower():
+        prod_lower = prod.lower()
+        if "solar" in prod_lower:
+            cat = "Solar Cables"
+        elif "submersible" in prod_lower or "sub " in prod_lower:
             cat = "Submersible Cables"
-        elif "control" in prod.lower():
+        elif "control" in prod_lower:
             cat = "Control Cables"
+        elif "flexible" in prod_lower or "cord" in prod_lower:
+            cat = "Flexible Cables"
+        elif "ht cable" in prod_lower or "high tension" in prod_lower or "11kv" in prod_lower or "33kv" in prod_lower:
+            cat = "HT Cables"
+        elif "armoured" in prod_lower or "armored" in prod_lower:
+            if "copper" in prod_lower:
+                cat = "Copper Armoured Cables"
+            elif "aluminium" in prod_lower or "aluminum" in prod_lower:
+                cat = "Aluminium Armoured Cables"
+            else:
+                cat = "Armoured Cables"
+        elif "unarmoured" in prod_lower or "unarmored" in prod_lower:
+            if "copper" in prod_lower:
+                cat = "Copper Unarmoured Cables"
+            else:
+                cat = "Aluminium Unarmoured Cables"
+        elif "thermocouple" in prod_lower:
+            cat = "Thermocouple Cables"
+        elif "wind" in prod_lower:
+            cat = "Wind Power Cables"
+        elif "triple" in prod_lower:
+            cat = "Triple Coating Cables"
+        elif "house" in prod_lower or "fr" in prod_lower or "wire" in prod_lower:
+            cat = "House Wires"
+        else:
+            cat = "Power Cables"
         
         categories[cat] = categories.get(cat, 0) + 1
         
     return {
         "total_leads": total_leads,
         "new_leads": new_leads,
+        "contacted_leads": contacted_leads,
         "quoted_leads": quoted_leads,
         "won_leads": won_leads,
+        "lost_leads": lost_leads,
         "category_distribution": categories
     }
 

@@ -188,7 +188,13 @@ function renderProductChart(distribution) {
                     '#10b981', // Emerald
                     '#a855f7', // Purple
                     '#f59e0b', // Amber
-                    '#f43f5e'  // Rose
+                    '#f43f5e', // Rose
+                    '#3b82f6', // Blue
+                    '#ec4899', // Pink
+                    '#14b8a6', // Teal
+                    '#84cc16', // Lime
+                    '#f97316', // Orange
+                    '#6b7280'  // Gray
                 ],
                 borderWidth: 2,
                 borderColor: '#111827'
@@ -219,20 +225,13 @@ function renderStatusChart(stats) {
         statusChart.destroy();
     }
     
-    const leads = leadsData.length ? leadsData : [];
     const counts = {
         'New': stats.new_leads || 0,
-        'Contacted': 0,
+        'Contacted': stats.contacted_leads || 0,
         'Quoted': stats.quoted_leads || 0,
         'Won': stats.won_leads || 0,
-        'Lost': 0
+        'Lost': stats.lost_leads || 0
     };
-    
-    // Count remaining statuses if we have raw data, else fallback to API
-    leadsData.forEach(lead => {
-        if (lead.status === 'Contacted') counts['Contacted']++;
-        if (lead.status === 'Lost') counts['Lost']++;
-    });
     
     statusChart = new Chart(ctx, {
         type: 'bar',
