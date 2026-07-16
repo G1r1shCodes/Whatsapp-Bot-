@@ -81,7 +81,22 @@ def get_ai_response(phone, profile_name):
         try:
             docs = vectorstore.similarity_search(last_msg, k=3)
             if docs:
-                retrieved_context = "\n".join(doc.page_content for doc in docs)
+                raw_context = "\n".join(doc.page_content for doc in docs)
+                # Clean up raw website UI button/navigation phrases
+                phrases_to_remove = [
+                    r"(?i)get\s+best\s+quote",
+                    r"(?i)request\s+callback",
+                    r"(?i)get\s+latest\s+price",
+                    r"(?i)yes!\s+i\s+am\s+interested",
+                    r"(?i)add\s+to\s+inquiry",
+                    r"(?i)send\s+inquiry",
+                ]
+                cleaned = raw_context
+                for pattern in phrases_to_remove:
+                    cleaned = re.sub(pattern, "", cleaned)
+                # Clean up double linebreaks or trailing whitespace
+                cleaned = "\n".join(line.strip() for line in cleaned.split("\n") if line.strip())
+                retrieved_context = cleaned
         except Exception as e:
             logger.error(f"Vector search error: {e}")
 
