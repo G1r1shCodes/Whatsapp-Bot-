@@ -63,7 +63,7 @@ def get_ai_response(phone, profile_name):
         last_msg = inbound_history[-1]["body"].strip().lower()
 
     last_msg_clean = re.sub(r'[^\w\s]', '', last_msg).strip()
-    greeting_words = {"hi", "hello", "hey", "hii", "helo", "yoo", "greetings", "dear", "sup", "hi there", "hello there", "good morning", "good evening", "good afternoon"}
+    greeting_words = {"hi", "hello", "hey", "hii", "helo", "yoo", "greetings", "dear", "sup", "hi there", "hello there", "good morning", "good evening", "good afternoon", "namaste", "namaskar", "pranam"}
     is_greeting = last_msg_clean in greeting_words
 
     # conversation_start = True means this is the very first message (no prior history)
