@@ -1,6 +1,6 @@
 import os
 import json
-import urllib.request
+import httpx
 import urllib.parse
 from datetime import datetime, timedelta
 # Helper to load .env variables manually
@@ -22,6 +22,9 @@ load_env()
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
+http_client = httpx.Client(timeout=10.0)
+
+
 def request_supabase(endpoint, method="GET", data=None, params=None):
     if not SUPABASE_URL or not SUPABASE_KEY:
         logger.warning(f"SUPABASE_URL or SUPABASE_KEY is missing. Returning mock data for {endpoint}.")
@@ -39,24 +42,27 @@ def request_supabase(endpoint, method="GET", data=None, params=None):
 
     try:
         url = f"{SUPABASE_URL}/rest/v1/{endpoint}"
-        if params:
-            url += "?" + urllib.parse.urlencode(params)
-            
-        req_data = None
-        if data is not None:
-            req_data = json.dumps(data).encode("utf-8")
-            
-        req = urllib.request.Request(url, data=req_data, method=method)
-        req.add_header("apikey", SUPABASE_KEY)
-        req.add_header("Authorization", f"Bearer {SUPABASE_KEY}")
-        req.add_header("Content-Type", "application/json")
-        req.add_header("Prefer", "return=representation")
         
-        with urllib.request.urlopen(req) as res:
-            res_content = res.read().decode("utf-8")
-            if res_content:
-                return json.loads(res_content)
-            return []
+        headers = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}",
+            "Content-Type": "application/json",
+            "Prefer": "return=representation"
+        }
+        
+        response = http_client.request(
+            method, 
+            url, 
+            json=data if data is not None else None,
+            params=params, 
+            headers=headers
+        )
+        response.raise_for_status()
+        
+        res_content = response.text
+        if res_content:
+            return response.json()
+        return []
     except Exception as e:
         logger.error(f"Supabase API error on {endpoint} [{method}]: {e}")
         return []

@@ -18,19 +18,19 @@ class TestChatMessage(BaseModel):
     profile_name: str = "Tester"
 
 @router.get("/dashboard")
-async def get_dashboard(request: Request):
+def get_dashboard(request: Request):
     if not auth.verify_auth(request):
         return RedirectResponse(url="/login")
     return FileResponse("templates/dashboard.html")
 
 @router.get("/test-chat")
-async def get_test_chat(request: Request):
+def get_test_chat(request: Request):
     if not auth.verify_auth(request):
         return RedirectResponse(url="/login")
     return FileResponse("templates/test_chat.html")
 
 @router.post("/api/test-chat")
-async def api_test_chat(msg: TestChatMessage, request: Request):
+def api_test_chat(msg: TestChatMessage, request: Request):
     """Bypasses Meta API and interacts directly with AI for testing."""
     auth.require_auth(request)
     incoming_msg = msg.message.strip()
@@ -88,12 +88,12 @@ async def api_test_chat(msg: TestChatMessage, request: Request):
     return {"reply": reply_text, "image": image_file}
 
 @router.get("/api/leads")
-async def get_leads_api(request: Request, status: str = None, search: str = None):
+def get_leads_api(request: Request, status: str = None, search: str = None):
     auth.require_auth(request)
     return db.get_leads(status_filter=status, search_query=search)
 
 @router.get("/api/leads/export")
-async def export_leads_csv(request: Request):
+def export_leads_csv(request: Request):
     auth.require_auth(request)
     leads = db.get_leads()
     
@@ -143,12 +143,12 @@ async def update_lead_status_api(lead_id: int, request: Request):
     return {"success": True, "lead_id": lead_id, "status": status}
 
 @router.get("/api/leads/{phone}/history")
-async def get_lead_history_api(phone: str, request: Request):
+def get_lead_history_api(phone: str, request: Request):
     auth.require_auth(request)
     return db.get_chat_history(phone)
 
 @router.get("/api/dashboard/stats")
-async def get_stats_api(request: Request):
+def get_stats_api(request: Request):
     auth.require_auth(request)
     leads = db.get_leads()
     
@@ -214,7 +214,7 @@ async def get_stats_api(request: Request):
     }
 
 @router.get("/api/products")
-async def get_products_api(request: Request):
+def get_products_api(request: Request):
     auth.require_auth(request)
     return db.get_all_products()
 
@@ -231,7 +231,7 @@ async def update_product_api(product_name: str, request: Request):
     return {"success": True, "product": product_name}
 
 @router.get("/api/settings")
-async def get_settings_api(request: Request):
+def get_settings_api(request: Request):
     auth.require_auth(request)
     return config_manager.get_config()
 

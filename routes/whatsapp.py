@@ -1,11 +1,13 @@
 import os
 import json
-import urllib.request
 import re
 from fastapi import APIRouter, Request, Response, HTTPException, BackgroundTasks
 import db
 import ai
+import httpx
 from logger import get_logger
+
+http_client = httpx.Client(timeout=10.0)
 
 logger = get_logger(__name__)
 
@@ -43,9 +45,9 @@ def send_whatsapp_message(to_phone: str, text: str, image_url: str = None, show_
             payload_img["image"]["caption"] = text
             
         try:
-            req = urllib.request.Request(url, data=json.dumps(payload_img).encode("utf-8"), headers=headers, method="POST")
-            with urllib.request.urlopen(req) as response:
-                logger.info("Sent image successfully")
+            response = http_client.post(url, json=payload_img, headers=headers)
+            response.raise_for_status()
+            logger.info("Sent image successfully")
         except Exception as e:
             logger.error(f"Error sending Meta image: {e}")
 
@@ -102,11 +104,11 @@ def send_whatsapp_message(to_phone: str, text: str, image_url: str = None, show_
             }
             
         try:
-            req = urllib.request.Request(url, data=json.dumps(payload_menu).encode("utf-8"), headers=headers, method="POST")
-            with urllib.request.urlopen(req) as response:
-                logger.info("Sent menu successfully")
-        except urllib.error.HTTPError as he:
-            logger.error(f"Error sending Meta menu (HTTP {he.code}): {he.read().decode('utf-8')}")
+            response = http_client.post(url, json=payload_menu, headers=headers)
+            response.raise_for_status()
+            logger.info("Sent menu successfully")
+        except httpx.HTTPStatusError as he:
+            logger.error(f"Error sending Meta menu (HTTP {he.response.status_code}): {he.response.text}")
         except Exception as e:
             logger.error(f"Error sending Meta menu: {e}")
 
@@ -147,11 +149,11 @@ def send_whatsapp_message(to_phone: str, text: str, image_url: str = None, show_
             }
         }
         try:
-            req = urllib.request.Request(url, data=json.dumps(payload_cat).encode("utf-8"), headers=headers, method="POST")
-            with urllib.request.urlopen(req) as response:
-                logger.info("Sent categories menu successfully")
-        except urllib.error.HTTPError as he:
-            logger.error(f"Error sending Meta cat menu (HTTP {he.code}): {he.read().decode('utf-8')}")
+            response = http_client.post(url, json=payload_cat, headers=headers)
+            response.raise_for_status()
+            logger.info("Sent categories menu successfully")
+        except httpx.HTTPStatusError as he:
+            logger.error(f"Error sending Meta cat menu (HTTP {he.response.status_code}): {he.response.text}")
         except Exception as e:
             logger.error(f"Error sending Meta cat menu: {e}")
             
@@ -170,11 +172,11 @@ def send_whatsapp_message(to_phone: str, text: str, image_url: str = None, show_
             }
         }
         try:
-            req = urllib.request.Request(url, data=json.dumps(payload_text).encode("utf-8"), headers=headers, method="POST")
-            with urllib.request.urlopen(req) as response:
-                logger.info("Sent text successfully")
-        except urllib.error.HTTPError as he:
-            logger.error(f"Error sending Meta text (HTTP {he.code}): {he.read().decode('utf-8')}")
+            response = http_client.post(url, json=payload_text, headers=headers)
+            response.raise_for_status()
+            logger.info("Sent text successfully")
+        except httpx.HTTPStatusError as he:
+            logger.error(f"Error sending Meta text (HTTP {he.response.status_code}): {he.response.text}")
         except Exception as e:
             logger.error(f"Error sending Meta text: {e}")
 

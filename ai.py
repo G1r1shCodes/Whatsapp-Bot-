@@ -1,10 +1,12 @@
 import os
-import urllib.request
 import urllib.parse
 import json
 import time
 import re
 import db
+import warnings
+import prompts
+import httpx
 import warnings
 import prompts
 from collections import defaultdict
@@ -36,6 +38,9 @@ GROQ_API_KEY = os.environ.get("GROQ_API")
 GROQ_MODEL = "llama-3.1-8b-instant"
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+
+http_client = httpx.Client(timeout=30.0)
+
 
 # Initialize Vector DB globally to avoid reloading models per request
 try:
@@ -170,27 +175,28 @@ def get_ai_response(phone, profile_name):
     }
     
     url = "https://api.groq.com/openai/v1/chat/completions"
-    data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(url, data=data, method="POST")
-    req.add_header("Content-Type", "application/json")
-    req.add_header("Authorization", f"Bearer {GROQ_API_KEY}")
-    req.add_header("User-Agent", "Mozilla/5.0")
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "User-Agent": "Mozilla/5.0"
+    }
     
     retries = 4
     delay = 3.0
     
     for attempt in range(retries):
         try:
-            with urllib.request.urlopen(req) as res:
-                res_data = json.loads(res.read().decode("utf-8"))
-                return res_data["choices"][0]["message"]["content"]
-        except urllib.error.HTTPError as he:
-            if he.code == 429 and attempt < retries - 1:
+            response = http_client.post(url, json=payload, headers=headers)
+            response.raise_for_status()
+            res_data = response.json()
+            return res_data["choices"][0]["message"]["content"]
+        except httpx.HTTPStatusError as he:
+            if he.response.status_code == 429 and attempt < retries - 1:
                 logger.warning(f"Rate limited (429) by Groq. Retrying in {delay} seconds (attempt {attempt+1}/{retries})...")
                 time.sleep(delay)
                 delay *= 2.0  # Exponential backoff
                 continue
-            logger.error(f"Groq API HTTPError {he.code}: {he.reason}")
+            logger.error(f"Groq API HTTPStatusError {he.response.status_code}: {he.response.text}")
             break
         except Exception as e:
             logger.error(f"Unexpected error calling Groq API: {e}")
